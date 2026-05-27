@@ -1,4 +1,6 @@
-export default function Close() {
+import React from "react";
+
+export default function Close(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="11"
@@ -6,6 +8,7 @@ export default function Close() {
       viewBox="0 0 11 11"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         d="M0.696289 0.5L10.5002 10.5"
