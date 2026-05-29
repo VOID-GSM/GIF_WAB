@@ -1,4 +1,5 @@
 export { default as Button } from "./Button";
+export { default as NotFound } from "./NotFound";
 
 export { default as Chevron } from "./svg/Chevron";
 export { default as Close } from "./svg/Close";
