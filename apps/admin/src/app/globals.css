@@ -2,6 +2,8 @@
 @import "pretendard/dist/web/static/pretendard.css";
 @import "@repo/ui/tokens.css";
 
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";
+
 body {
   font-family: var(--font-sans);
 }
