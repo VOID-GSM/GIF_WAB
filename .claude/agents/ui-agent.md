@@ -16,15 +16,18 @@ Build the UI layer: Next.js pages, layouts, and components following the GIF pro
 - Import shared components from `@repo/ui`; create app-specific components locally
 - Use Sonner toast (`import { toast } from "sonner"`) for user-facing feedback in Client Components
 
-## File Location Rules
-| What | Where |
-|------|-------|
-| App page | `apps/{app}/src/app/{route}/page.tsx` |
-| Route layout | `apps/{app}/src/app/{route}/layout.tsx` |
-| Loading UI | `apps/{app}/src/app/{route}/loading.tsx` |
-| Error UI | `apps/{app}/src/app/{route}/error.tsx` |
-| App-specific component | `apps/{app}/src/components/{Feature}/{Name}.tsx` |
-| Shared component | `packages/ui/src/{Name}.tsx` + export in `packages/ui/src/index.ts` |
+## File Location Rules (FSD)
+| What | FSD Layer | Path |
+|------|-----------|------|
+| Route entry | `app` | `apps/{app}/src/app/{route}/page.tsx` |
+| Route layout / guard | `app` | `apps/{app}/src/app/{route}/layout.tsx` |
+| Loading / Error UI | `app` | `apps/{app}/src/app/{route}/loading.tsx` / `error.tsx` |
+| Page composition | `views` | `apps/{app}/src/views/{page}/ui/{Page}View.tsx` |
+| Reusable page section | `widgets` | `apps/{app}/src/widgets/{name}/ui/{Name}.tsx` |
+| User action UI | `features` | `apps/{app}/src/features/{action}/ui/{Name}.tsx` |
+| Entity display UI | `entities` | `apps/{app}/src/entities/{domain}/ui/{Name}.tsx` |
+| Shared primitive UI | `shared` | `apps/{app}/src/shared/ui/{Name}.tsx` |
+| Cross-app shared component | packages | `packages/ui/src/{Name}.tsx` + export in `packages/ui/src/index.ts` |
 
 ## Role-based Route Structure (Admin App)
 Use Next.js Route Groups to separate teacher roles:
@@ -60,8 +63,9 @@ export default async function Page() {
 import { useState } from "react";
 import { useResourceList } from "@/hooks/queries/useResource";
 
+// Hook imported from the entity's api segment
 export function ResourceList() {
-  const { data, isPending } = useResourceList();
+  const { data, isPending } = useResourceList(); // from @/entities/{domain}/api/use{Domain}
   const [selected, setSelected] = useState<number | null>(null);
 
   if (isPending) return <p>Loading...</p>;
@@ -92,13 +96,15 @@ Reference CSS custom properties defined in `packages/ui/src/tokens.css`:
 </div>
 ```
 
-## Component Shared vs App-specific Decision
-| Criteria | Location |
-|----------|----------|
-| Used in both admin AND client | `packages/ui/src/` |
-| Used in only one app | `apps/{app}/src/components/` |
-| Pure visual (no data) | `packages/ui/src/` |
-| Contains business logic or app-specific hooks | App-local only |
+## FSD Layer Decision
+| Component type | Layer |
+|----------------|-------|
+| Domain object display (ProjectCard, TeamRow) | `entities/{domain}/ui/` |
+| User action UI (SubmitForm, EvaluateButton) | `features/{action}/ui/` |
+| Composite page section (ProjectTable with pagination) | `widgets/{name}/ui/` |
+| Full page assembled from widgets/features | `views/{page}/ui/` |
+| Generic primitive (Spinner, Badge, Modal) | `shared/ui/` |
+| Reusable across both admin AND client | `packages/ui/src/` |
 
 ## Input / Output Protocol
 **Input:** Feature description, created API hook files (from `api-agent`), target app, design requirements  
