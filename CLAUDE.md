@@ -27,39 +27,45 @@ GIF is a comprehensive management service designed to efficiently operate the en
 
 ## Code Style & Architecture Guidelines
 
-### 1. Monorepo Structure (Turborepo 2)
+### 1. FSD Architecture Rules
+
+Both `apps/admin` and `apps/client` strictly follow these directory structure and architectural layers:
+
+- `src/app`: route entrypoints, layouts, and route-level guards
+- `src/views`: page composition
+- `src/widgets`: reusable page sections
+- `src/features`: user actions
+- `src/entities`: domain types, API hooks, and entity UI
+- `src/shared`: common clients, hooks, stores, styles, assets, and utilities
+
+### 2. Monorepo Structure (Turborepo 2)
 
 - `apps/admin`: Admin web service for teachers (Coordinator, Major, General, Head of Grade)
 - `apps/client`: Client web service for students (Team project management and material submission)
 - `packages/*`: Shared components (ui), common configurations, and utility files
 
-### 2. Next.js 15 & React 19 Development Rules
+### 3. Next.js 15 & React 19 Development Rules
 
 - All components must be authored as Server Components by default. Explicitly declare the `'use client'` directive at the very top of the file only when using state management, event handling, or TanStack Query hooks.
 - Write robust, standardized code by leveraging the latest features of React 19 and Next.js 15, such as asynchronous Server Actions, data mutation handling, and updated caching behaviors.
 
-### 3. Data Fetching Rules (TanStack Query 5 & Axios)
+### 4. Data Fetching Rules (TanStack Query 5 & Axios)
 
 - API requests must be modularized and managed using Axios instances.
 - Server data synchronization and caching must strictly adhere to TanStack Query v5 conventions, including the mandatory use of array-type `queryKey`, `useQuery`, and `useMutation`.
-
-### 4. Role-based Authorization
-
-- **Admin:** Ensure robust UI branching and page-level access control (via Middleware and Layouts) based on the teacher's specific role (Idea Festival Coordinator, Major Subject Teacher, General Subject Teacher, Head of Grade).
-- **Client:** Verify team membership to ensure that any student belonging to the respective team (both the team leader and team members) can freely submit and modify project materials.
-
----
 
 ## Harness: GIF Development & Git Workflow
 
 **Goal:** Enforce consistent development patterns (API layer, components, pages) and automate the full git pipeline.
 
 ### Development Workflow
+
 - **Full feature** (API + UI together): use `gif-feature` skill
 - **API only** (service + hooks): use `gif-api` skill
 - **Page/component only**: use `gif-component` skill
 
 ### Git Workflow
+
 - **Any git operation** (commit, push, PR, review comments): use `gif-workflow` skill
 
 Simple code questions can be answered directly without a skill.
