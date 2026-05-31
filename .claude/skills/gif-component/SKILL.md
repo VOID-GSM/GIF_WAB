@@ -16,17 +16,25 @@ Default to **Server Component**. Add `"use client"` only when the component need
 
 If a page needs both server data and client interactivity: keep the page as a Server Component and extract only the interactive part into a separate Client Component child.
 
-## File Locations
-| What | Path |
-|------|------|
-| Page | `apps/{app}/src/app/{route}/page.tsx` |
-| Layout | `apps/{app}/src/app/{route}/layout.tsx` |
-| Loading UI | `apps/{app}/src/app/{route}/loading.tsx` |
-| Error UI | `apps/{app}/src/app/{route}/error.tsx` |
-| App-specific component | `apps/{app}/src/components/{Feature}/{Name}.tsx` |
-| Shared component | `packages/ui/src/{Name}.tsx` + add export to `packages/ui/src/index.ts` |
+## File Locations (FSD)
+| What | FSD Layer | Path |
+|------|-----------|------|
+| Route entry | `app` | `apps/{app}/src/app/{route}/page.tsx` |
+| Route layout / guard | `app` | `apps/{app}/src/app/{route}/layout.tsx` |
+| Loading / Error UI | `app` | `apps/{app}/src/app/{route}/loading.tsx` / `error.tsx` |
+| Page composition | `views` | `apps/{app}/src/views/{page}/ui/{Page}View.tsx` |
+| Reusable page section | `widgets` | `apps/{app}/src/widgets/{name}/ui/{Name}.tsx` |
+| User action UI | `features` | `apps/{app}/src/features/{action}/ui/{Name}.tsx` |
+| Entity display UI | `entities` | `apps/{app}/src/entities/{domain}/ui/{Name}.tsx` |
+| Shared primitive | `shared` | `apps/{app}/src/shared/ui/{Name}.tsx` |
+| Cross-app shared | packages | `packages/ui/src/{Name}.tsx` + export in `packages/ui/src/index.ts` |
 
-**Shared vs app-local:** Put in `packages/ui` only if the component is purely visual (no data), generic, and reusable across both admin and client. Otherwise keep it app-local.
+**Which layer?**
+- Domain display (ProjectCard, TeamRow) → `entities`
+- User action (SubmitForm, EvaluateButton) → `features`
+- Composite section (table + pagination) → `widgets`
+- Full assembled page → `views`
+- Generic primitive (Spinner, Badge) → `shared/ui` or `packages/ui`
 
 ## Server Component
 ```tsx
@@ -50,7 +58,7 @@ export default async function ResourcePage() {
 "use client";
 
 import { useState } from "react";
-import { useResourceList } from "@/hooks/queries/useResource";
+import { useResourceList } from "@/entities/{domain}/api/use{Domain}";
 import { toast } from "sonner";
 
 export function ResourceList() {
