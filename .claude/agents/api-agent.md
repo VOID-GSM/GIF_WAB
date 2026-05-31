@@ -16,25 +16,30 @@ Build the complete API layer for a feature: TypeScript types → Axios service f
 - Mutation success/error feedback goes through Sonner (`toast.success`, `toast.error`)
 - Services are pure functions — no hooks, no state inside service files
 
-## File Structure
+## File Structure (FSD)
 ```
 apps/{admin|client}/src/
-├── types/
-│   └── {resource}.ts          ← request/response TypeScript types
-├── services/
-│   └── {resource}.ts          ← Axios service functions (plain async functions)
-└── hooks/
-    └── queries/
-        └── use{Resource}.ts   ← TanStack Query hooks (useQuery / useMutation)
+├── entities/{domain}/           ← domain data, types, and CRUD API
+│   ├── model/
+│   │   └── types.ts            ← TypeScript interfaces
+│   └── api/
+│       ├── {domain}Api.ts      ← Axios service functions
+│       └── use{Domain}.ts      ← TanStack Query hooks
+└── features/{action}/          ← user-action-specific API (complex mutations only)
+    └── api/
+        ├── {action}Api.ts
+        └── use{Action}.ts
 ```
 
-If types or response shapes are shared between admin and client, put them in `packages/lib/src/types/{resource}.ts` and export from `packages/lib/src/index.ts`.
+Default: place everything in `entities/`. Use `features/` only when the operation is a distinct user action (e.g., `submit-project`, `evaluate-form`) that doesn't map to a simple CRUD operation on an entity.
+
+Types shared across admin and client → `packages/lib/src/types/{resource}.ts`, export from `packages/lib/src/index.ts`.
 
 ## Service Function Pattern
 ```typescript
-// apps/{app}/src/services/{resource}.ts
+// apps/{app}/src/entities/{domain}/api/{domain}Api.ts
 import { apiClient } from "@repo/lib";
-import type { Resource, CreateResourceDto } from "@/types/{resource}";
+import type { Resource, CreateResourceDto } from "../model/types";
 
 export const getResource = async (id: number): Promise<Resource> => {
   const { data } = await apiClient.get<Resource>(`/{resource}/${id}`);
@@ -63,10 +68,10 @@ export const deleteResource = async (id: number): Promise<void> => {
 
 ## TanStack Query Hook Patterns
 ```typescript
-// apps/{app}/src/hooks/queries/use{Resource}.ts
+// apps/{app}/src/entities/{domain}/api/use{Domain}.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getResource, createResource } from "@/services/{resource}";
+import { getResource, createResource } from "./{domain}Api";
 
 // Query
 export const use{Resource} = (id: number) => {
@@ -109,7 +114,7 @@ export const useCreate{Resource} = () => {
 
 ## TypeScript Type Pattern
 ```typescript
-// apps/{app}/src/types/{resource}.ts
+// apps/{app}/src/entities/{domain}/model/types.ts
 export interface {Resource} {
   id: number;
   // ... fields
