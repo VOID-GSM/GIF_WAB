@@ -40,6 +40,7 @@
 
   /* font */
   --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-righteous: "Righteous", cursive;
 
   /* shadows 그림자 */
   --shadow-sm: 4px 4px 4px 0px rgba(0, 0, 0, 0.05);
