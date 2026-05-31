@@ -5,18 +5,21 @@ description: "Creates API service functions and TanStack Query hooks for the GIF
 
 # GIF API Skill
 
-## File Locations
+## File Locations (FSD)
 ```
-apps/{admin|client}/src/
-├── types/{resource}.ts         ← TypeScript interfaces
-├── services/{resource}.ts      ← Axios service functions
-└── hooks/queries/use{Resource}.ts  ← TanStack Query hooks
+apps/{admin|client}/src/entities/{domain}/
+├── model/
+│   └── types.ts                ← TypeScript interfaces
+└── api/
+    ├── {domain}Api.ts          ← Axios service functions
+    └── use{Domain}.ts          ← TanStack Query hooks
 ```
-Shared across apps → `packages/lib/src/types/` and export from `packages/lib/src/index.ts`.
+User-action-specific API → `src/features/{action}/api/` instead.  
+Types shared across apps → `packages/lib/src/types/`, export from `packages/lib/src/index.ts`.
 
 ## Types
 ```typescript
-// apps/{app}/src/types/{resource}.ts
+// apps/{app}/src/entities/{domain}/model/types.ts
 export interface {Resource} {
   id: number;
   // ... domain fields
@@ -35,9 +38,9 @@ export interface Update{Resource}Dto extends Partial<Create{Resource}Dto> {}
 Always use `apiClient` from `@repo/lib`. Destructure `data` from the response.
 
 ```typescript
-// apps/{app}/src/services/{resource}.ts
+// apps/{app}/src/entities/{domain}/api/{domain}Api.ts
 import { apiClient } from "@repo/lib";
-import type { Resource, CreateResourceDto, UpdateResourceDto } from "@/types/{resource}";
+import type { Resource, CreateResourceDto, UpdateResourceDto } from "../model/types";
 
 export const get{Resource}s = async (): Promise<{Resource}[]> => {
   const { data } = await apiClient.get<{Resource}[]>("/{resources}");
@@ -66,7 +69,7 @@ export const delete{Resource} = async (id: number): Promise<void> => {
 
 ## TanStack Query Hooks (v5)
 ```typescript
-// apps/{app}/src/hooks/queries/use{Resource}.ts
+// apps/{app}/src/entities/{domain}/api/use{Domain}.ts
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -77,7 +80,7 @@ import {
   create{Resource},
   update{Resource},
   delete{Resource},
-} from "@/services/{resource}";
+} from "./{domain}Api";
 
 // --- Queries ---
 
