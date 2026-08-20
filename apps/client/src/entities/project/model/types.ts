@@ -71,6 +71,21 @@ export interface ProjectDetail {
 // GET /api/project/{projectId}/summary — AI가 생성한 프로젝트 요약 (응답은 요약 문자열)
 export type ProjectSummaryResponse = string;
 
+// GET /api/project/{projectId}/links — GitHub·배포 주소 등 팀이 등록한 링크
+export interface ProjectLink {
+  id: number;
+  title: string;
+  url: string;
+}
+
+export type GetProjectLinksResponse = ProjectLink[];
+
+// POST /api/project/{projectId}/links, PATCH .../{linkId} 공용 요청 바디
+export interface ProjectLinkRequest {
+  title: string;
+  url: string;
+}
+
 // PUT /api/project/{projectId}/update — 멤버는 추가/삭제 델타로 전달
 export interface UpdateProjectRequest {
   name: string;

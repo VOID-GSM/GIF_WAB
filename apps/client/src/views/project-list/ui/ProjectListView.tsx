@@ -19,9 +19,9 @@ export default function ProjectListView() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4">
         {isPending ? (
-          <p className="text-[14px] text-gray-600">불러오는 중...</p>
+          <p className="py-20 text-center text-gray-500">불러오는 중...</p>
         ) : isError ? (
-          <p className="text-[14px] text-gray-600">
+          <p className="py-20 text-center text-gray-500">
             프로젝트 정보를 불러오지 못했습니다.
           </p>
         ) : (

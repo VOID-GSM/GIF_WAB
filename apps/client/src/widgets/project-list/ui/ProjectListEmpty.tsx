@@ -13,10 +13,8 @@ export default function ProjectListEmpty({
 }: ProjectListEmptyProps) {
   if (role === "LEADER") {
     return (
-      <div className="flex flex-col items-center justify-center gap-6 text-center">
-        <p className="text-2xl font-medium text-gray-500">
-          아직 생성한 프로젝트가 없습니다.
-        </p>
+      <div className="flex flex-col items-center justify-center gap-6 py-20 text-center">
+        <p className="text-gray-500">아직 생성한 프로젝트가 없습니다.</p>
         <button
           type="button"
           onClick={onCreateProject}
@@ -29,7 +27,7 @@ export default function ProjectListEmpty({
   }
 
   return (
-    <p className="flex items-center justify-center text-center text-2xl font-medium text-gray-500">
+    <p className="py-20 text-center text-gray-500">
       아직 참여한 프로젝트가 없습니다. <br /> 팀장이 프로젝트를 생성하면
       자동으로 참여됩니다.
     </p>

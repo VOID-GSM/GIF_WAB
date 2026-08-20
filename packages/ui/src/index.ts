@@ -24,6 +24,7 @@ export { default as Textarea } from "./components/Input/Textarea";
 export { default as Markdown } from "./components/Markdown/Markdown";
 export { default as FileUpload } from "./components/FileUpload/FileUpload";
 export { default as ProjectLogo } from "./components/ProjectLogo/ProjectLogo";
+export { default as ProjectLinkChip } from "./components/ProjectLink/ProjectLinkChip";
 
 export { default as StyleDropdown } from "./components/Dropdown/StyleDropdown";
 
@@ -57,14 +58,14 @@ export { default as File } from "./svg/File";
 export { default as Color } from "./svg/Color";
 export { default as Crown } from "./svg/Crown";
 
-export type { NavItem } from "./widgets/Navbar/model/type";
-
 export {
   URL_SUBMISSION_FLAG,
   ALLOWED_EXTENSION_OPTIONS,
   splitAllowedExtensions,
   isValidSubmissionUrl,
 } from "./lib/formFieldOptions";
+
+export type { NavItem } from "./widgets/Navbar/model/type";
 export type { NavbarProps } from "./widgets/Navbar/model/type";
 export type { SidebarProps } from "./widgets/Navbar/model/type";
 

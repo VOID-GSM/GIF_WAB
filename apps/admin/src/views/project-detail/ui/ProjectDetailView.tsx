@@ -18,6 +18,7 @@ import {
 } from "@/entities/project";
 import AiSummarySection from "@/widgets/project-detail/ui/AiSummarySection";
 import LeaderTransferModal from "@/widgets/project-detail/ui/LeaderTransferModal";
+import ProjectLinkSection from "@/widgets/project-detail/ui/ProjectLinkSection";
 import MemoSection from "@/widgets/project-detail/ui/MemoSection";
 import ScoreAssignSection from "@/widgets/project-detail/ui/ScoreAssignSection";
 
@@ -111,6 +112,11 @@ export default function ProjectDetailView({
           summary={<AiSummarySection projectId={projectId} />}
           onMemberClick={canTransferLeader ? handleMemberClick : undefined}
         />
+
+        {/* 링크 — 팀이 등록한 GitHub·배포 주소. 등록된 링크가 없으면 노출하지 않는다 */}
+        <div className="mt-4 empty:mt-0">
+          <ProjectLinkSection projectId={projectId} />
+        </div>
 
         {/* 마감현황 · 양식 목록 (좌) / 메모 (우) */}
         <div className="mt-14 flex flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-12">

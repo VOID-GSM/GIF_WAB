@@ -2,6 +2,7 @@ export { useGetFilteredProjects } from "./hooks/useGetFilteredProjects";
 export { useStoredGrade } from "./hooks/useStoredGrade";
 export { useGetProject } from "./hooks/useGetProject";
 export { useGetProjectSummary } from "./hooks/useGetProjectSummary";
+export { useGetProjectLinks } from "./hooks/useGetProjectLinks";
 export { useGetProjectNote } from "./hooks/useGetProjectNote";
 export { useUpdateProjectNote } from "./hooks/useUpdateProjectNote";
 export { useTransferLeader } from "./hooks/useTransferLeader";
@@ -14,6 +15,8 @@ export type {
   ProjectDetail,
   ProjectMember,
   ProjectSummaryResponse,
+  ProjectLink,
+  GetProjectLinksResponse,
   GetProjectNoteResponse,
   UpdateProjectNoteRequest,
   TransferLeaderRequest,

@@ -8,6 +8,7 @@ import { getDeadlineSummary, useGetForms } from "@/entities/form";
 import { useGetMyProject, useGetProject } from "@/entities/project";
 
 import AiSummarySection from "@/widgets/project-detail/ui/AiSummarySection";
+import ProjectLinkSection from "@/widgets/project-detail/ui/ProjectLinkSection";
 import ScheduleSection from "@/widgets/project-detail/ui/ScheduleSection";
 
 interface ProjectDetailViewProps {
@@ -63,6 +64,11 @@ export default function ProjectDetailView({
             !isMine ? <AiSummarySection projectId={projectId} /> : undefined
           }
         />
+
+        {/* 링크 — 설명 바로 아래에 작은 칩으로. 다른 팀은 등록된 링크가 있을 때만 노출 */}
+        <div className="mt-4 empty:mt-0">
+          <ProjectLinkSection projectId={projectId} editable={isMine} />
+        </div>
 
         {/* 마감현황 · 양식 목록 (좌) / 일정 캘린더 (우) — 내 팀일 때만 */}
         {/* 프로젝트 설명 ↔ 마감현황 간격 56px */}

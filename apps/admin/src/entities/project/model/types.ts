@@ -35,6 +35,15 @@ export interface ProjectDetail {
 // GET /api/project/{projectId}/summary — AI가 생성한 프로젝트 요약 (응답은 요약 문자열)
 export type ProjectSummaryResponse = string;
 
+// GET /api/project/{projectId}/links — 팀이 등록한 GitHub·배포 주소 등 (admin 은 열람만)
+export interface ProjectLink {
+  id: number;
+  title: string;
+  url: string;
+}
+
+export type GetProjectLinksResponse = ProjectLink[];
+
 // GET /api/project/{projectId}/note — 프로젝트 메모 조회
 export interface GetProjectNoteResponse {
   projectId: number;

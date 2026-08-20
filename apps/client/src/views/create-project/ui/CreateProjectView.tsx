@@ -73,7 +73,7 @@ export function CreateProjectView() {
   };
 
   const underlineInput = (hasError: boolean) =>
-    `w-full border-b bg-transparent pb-1 text-2xl outline-none transition-colors duration-200 ${
+    `w-full border-b bg-transparent pb-1 text-2xl text-gray-900 outline-none transition-colors duration-200 ${
       hasError
         ? "border-red-500 focus:border-red-500"
         : "border-gray-300 focus:border-gray-900"
