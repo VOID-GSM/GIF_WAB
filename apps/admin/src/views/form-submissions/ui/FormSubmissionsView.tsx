@@ -80,16 +80,18 @@ export default function FormSubmissionsView({ formId }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col items-center gap-8 px-4 py-6 sm:gap-12 sm:py-10 bg-background">
-      {/* 880px 미만: [뒤로 / 미리보기] 한 줄 + 필터 아래 / 880px+: 필터 중앙, 양옆 버튼 */}
-      <div className="flex w-full max-w-[800px] flex-col items-center gap-4 min-[880px]:relative min-[880px]:flex-row min-[880px]:justify-center min-[880px]:gap-0">
+      {/* 880px 미만: [뒤로 / 미리보기] 한 줄 + 필터 아래 / 880px+: flex 3분할(뒤로 / 필터 / 버튼).
+          뒤로·버튼 그룹·학년 드롭다운은 shrink-0으로 크기를 고정하고, 남는 공간을 필터 영역이
+          flex-1로 가져가며 그 안에서 팀명 검색 input만 좁아지도록 해 서로 겹치지 않게 한다. */}
+      <div className="flex w-full max-w-[800px] flex-col items-center gap-4 min-[880px]:flex-row min-[880px]:items-center">
         <div className="flex w-full items-center justify-between min-[880px]:contents">
           <button
             onClick={() => router.back()}
-            className="z-10 flex items-center gap-2 text-base font-semibold text-gray-700 hover:text-gray-900 cursor-pointer min-[880px]:absolute min-[880px]:left-0 min-[880px]:top-1/2 min-[880px]:-translate-y-1/2 min-[880px]:text-lg"
+            className="flex items-center gap-2 text-base font-semibold text-gray-700 hover:text-gray-900 cursor-pointer min-[880px]:order-1 min-[880px]:shrink-0 min-[880px]:text-lg"
           >
             ← 뒤로
           </button>
-          <div className="z-10 flex items-center gap-2 min-[880px]:absolute min-[880px]:right-0 min-[880px]:top-1/2 min-[880px]:-translate-y-1/2">
+          <div className="flex items-center gap-2 min-[880px]:order-3 min-[880px]:shrink-0">
             <button
               type="button"
               onClick={() => toggleSubmissionFilter("SUBMITTED")}
@@ -122,15 +124,18 @@ export default function FormSubmissionsView({ formId }: Props) {
             </button>
           </div>
         </div>
-        <div className="flex w-full items-center justify-center gap-2 min-[880px]:w-auto">
-          <GradeFilter
-            value={selectedGrade ?? GRADES[0]}
-            onChange={setSelectedGrade}
-          />
+        <div className="flex w-full min-w-0 items-center justify-center gap-2 min-[880px]:order-2 min-[880px]:w-auto min-[880px]:flex-1">
+          <div className="shrink-0">
+            <GradeFilter
+              value={selectedGrade ?? GRADES[0]}
+              onChange={setSelectedGrade}
+            />
+          </div>
           <TeamFilter
             teamNames={rows.map((row) => row.teamName)}
             value={teamQuery}
             onChange={setTeamQuery}
+            widthClassName="w-[140px] min-[880px]:w-[110px]"
           />
         </div>
       </div>
@@ -180,11 +185,6 @@ export default function FormSubmissionsView({ formId }: Props) {
             >
               {/* 팀명 */}
               <span className="min-w-0 truncate text-base font-medium text-gray-900">
-                {row.teamName}
-              </span>
-
-              {/* 양식명 */}
-              <span className="min-w-0 truncate text-base font-medium text-gray-900">
                 {row.projectId ? (
                   <Link
                     href={`/projects/${row.projectId}`}
@@ -200,17 +200,7 @@ export default function FormSubmissionsView({ formId }: Props) {
 
               {/* 양식명 */}
               <span className="min-w-0 truncate text-sm text-gray-700">
-                {row.projectId ? (
-                  <Link
-                    href={`/projects/${row.projectId}`}
-                    className="inline-block max-w-full truncate underline-offset-2 transition-colors hover:text-yellow-700 hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {form?.title}
-                  </Link>
-                ) : (
-                  form?.title
-                )}
+                {form?.title}
               </span>
 
               {/* 마감 날짜 */}

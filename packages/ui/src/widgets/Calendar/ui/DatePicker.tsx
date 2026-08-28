@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { DatePickerProps } from "../model/type";
 
-export default function DatePicker({ value, onChange }: DatePickerProps) {
+export default function DatePicker({ value, onChange, displayValue }: DatePickerProps) {
   const today = new Date();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ export default function DatePicker({ value, onChange }: DatePickerProps) {
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span className={value ? "text-black" : "text-gray-500"}>
-          {value || "날짜를 선택하세요"}
+          {(displayValue ?? value) || "날짜를 선택하세요"}
         </span>
       </div>
 

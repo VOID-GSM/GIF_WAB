@@ -87,7 +87,7 @@ function DayCell({
       return (
         <div className={cell} onClick={() => onEventClick(event)}>
           <span
-            className="flex items-center justify-center w-7 h-7 text-sm sm:w-[35px] sm:h-[35px] sm:text-[20px] rounded-full cursor-pointer"
+            className="flex items-center justify-center w-7 h-7 text-sm sm:w-[35px] sm:h-[35px] sm:text-[20px] rounded-full cursor-pointer text-gray-900"
             style={{ border: `2px solid ${colorVar}` }}
           >
             {day}
@@ -98,7 +98,7 @@ function DayCell({
 
     return (
       <div
-        className={`flex items-center justify-center h-7 w-full text-sm sm:h-[35px] sm:text-[20px] cursor-pointer
+        className={`flex items-center justify-center h-7 w-full text-sm sm:h-[35px] sm:text-[20px] cursor-pointer text-gray-900
           ${isStart ? "rounded-l-full" : ""}
           ${isEnd ? "rounded-r-full" : ""}
         `}
@@ -127,7 +127,7 @@ function DayCell({
       onClick={() => mode === "write" && onDayClick(dateStr)}
     >
       <span
-        className={`flex items-center justify-center w-7 h-7 text-sm sm:w-9 sm:h-9 sm:text-[20px]
+        className={`flex items-center justify-center w-7 h-7 text-sm sm:w-9 sm:h-9 sm:text-[20px] text-gray-900
           ${isToday && !inSelectRange ? "bg-yellow-400 rounded-full" : ""}
         `}
       >
@@ -274,7 +274,9 @@ export default function CalendarField({
         />
       )}
 
-      <div className="text-center text-lg mb-4 sm:text-[20px]">{year}</div>
+      <div className="text-center text-lg mb-4 sm:text-[20px] text-gray-900">
+        {year}
+      </div>
 
       <div className="flex items-center justify-between mb-[10px]">
         <button
@@ -307,7 +309,7 @@ export default function CalendarField({
           {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
             <div
               key={i}
-              className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 mx-auto text-sm sm:text-[20px] font-semibold"
+              className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 mx-auto text-sm sm:text-[20px] font-semibold text-gray-900"
             >
               {d}
             </div>

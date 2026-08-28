@@ -39,23 +39,23 @@ export default function ScoreCollectionTable({ isLoading, isError, scoreRows }: 
       <div className="min-w-[40rem]">
         <div className="flex items-center bg-[var(--color-yellow-50)] border-y border-[var(--color-yellow-600)] dark:bg-[#85782c] dark:border-yellow-500/20 h-9 sticky top-0 z-10">
           {/* 핵심 정보 */}
-          <div className="w-16 sm:w-20 md:w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="w-16 sm:w-20 md:w-24 shrink-0 px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             등수
           </div>
-          <div className="flex-1 min-w-[6rem] text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="flex-1 min-w-[6rem] px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             팀명
           </div>
           {/* 영역별 평균 */}
-          <div className="w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="w-24 shrink-0 px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             전공
           </div>
-          <div className="w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="w-24 shrink-0 px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             보고서
           </div>
-          <div className="w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="w-24 shrink-0 px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             사회
           </div>
-          <div className="w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+          <div className="w-24 shrink-0 px-4 text-xs font-semibold text-[var(--color-gray-700)] dark:text-gray-100">
             총점수
           </div>
         </div>
@@ -69,10 +69,10 @@ export default function ScoreCollectionTable({ isLoading, isError, scoreRows }: 
               key={row.teamName}
               className="flex items-center h-11 border-t border-gray-100"
             >
-              <div className="w-16 sm:w-20 md:w-24 shrink-0 text-center font-medium text-sm sm:text-base text-gray-900">
+              <div className="w-16 sm:w-20 md:w-24 shrink-0 px-4 text-sm text-[var(--color-gray-800)] dark:text-gray-200">
                 {row.rank}
               </div>
-              <div className="flex-1 min-w-[6rem] text-center font-medium text-sm sm:text-base truncate text-gray-900">
+              <div className="flex-1 min-w-[6rem] truncate px-4 text-sm text-[var(--color-gray-800)] dark:text-gray-200">
                 {row.projectId ? (
                   <Link
                     href={`/projects/${row.projectId}`}
@@ -85,16 +85,16 @@ export default function ScoreCollectionTable({ isLoading, isError, scoreRows }: 
                 )}
               </div>
               {/* 영역별 평균 */}
-              <div className="w-24 shrink-0 text-center text-sm sm:text-base text-gray-600">
+              <div className="w-24 shrink-0 px-4 text-sm text-[var(--color-gray-600)] dark:text-gray-400">
                 {formatInt(row.majorAverage)}
               </div>
-              <div className="w-24 shrink-0 text-center text-sm sm:text-base text-gray-600">
+              <div className="w-24 shrink-0 px-4 text-sm text-[var(--color-gray-600)] dark:text-gray-400">
                 {formatInt(row.reportAverage)}
               </div>
-              <div className="w-24 shrink-0 text-center text-sm sm:text-base text-gray-600">
+              <div className="w-24 shrink-0 px-4 text-sm text-[var(--color-gray-600)] dark:text-gray-400">
                 {formatInt(row.communityAverage)}
               </div>
-              <div className="w-24 shrink-0 text-center text-sm sm:text-base text-gray-600">
+              <div className="w-24 shrink-0 px-4 text-sm text-[var(--color-gray-600)] dark:text-gray-400">
                 {formatInt(row.grandTotalAverage)}
               </div>
             </div>

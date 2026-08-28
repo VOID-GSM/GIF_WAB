@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { SidebarProps } from "@repo/ui";
 import { removeCookieValue } from "@repo/lib";
 import ThemeToggle from "../../Theme/ui/ThemeToggle";
+import Logout from "../../../svg/Logout";
 
 export default function Sidebar({ navItems, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
@@ -72,16 +73,17 @@ export default function Sidebar({ navItems, isOpen, onClose }: SidebarProps) {
         );
       })}
 
-      <div className="mt-auto flex flex-col gap-1 pt-3">
-        <ThemeToggle />
-
+      <div className="mt-auto flex flex-col gap-2 pt-3">
         <button
           type="button"
           onClick={handleLogout}
-          className="cursor-pointer px-4 py-3 text-left text-[16px] font-medium text-gray-500 outline-none transition-colors duration-200 hover:bg-gray-100 focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800 md:hidden"
+          className="flex h-[40px] w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] bg-gray-100 text-[13px] font-medium text-gray-600 outline-none transition-colors hover:bg-gray-200 hover:text-gray-700 focus-visible:bg-gray-200 dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800 md:hidden"
         >
+          <Logout className="h-[13px] w-[16px]" aria-hidden="true" />
           로그아웃
         </button>
+
+        <ThemeToggle />
       </div>
     </nav>
   );

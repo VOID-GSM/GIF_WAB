@@ -41,9 +41,7 @@ export default function NoticeCreateView() {
 
   const toggleGrade = (grade: number) =>
     setSelectedGrades((prev) =>
-      prev.includes(grade)
-        ? prev.filter((g) => g !== grade)
-        : [...prev, grade],
+      prev.includes(grade) ? prev.filter((g) => g !== grade) : [...prev, grade],
     );
 
   const toggleProject = (projectId: number) =>
@@ -131,6 +129,7 @@ export default function NoticeCreateView() {
                 setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))
               }
               maxLength={MAX_TITLE_LENGTH}
+              textClassName="text-[13px] text-gray-700"
             />
           </div>
 
@@ -171,8 +170,8 @@ export default function NoticeCreateView() {
                 {content.length}/{MAX_CONTENT_LENGTH}
               </span>
             </div>
-            <div className={isPreview ? "" : "hidden"}>
-              <div className="min-h-[144px] rounded-[10px] border border-gray-200 bg-white px-3.5 py-3">
+            {isPreview ? (
+              <div className="h-[200px] overflow-y-auto rounded-[10px] border border-gray-200 bg-white px-[16px] py-[13px]">
                 {content.trim() ? (
                   <Markdown content={content} />
                 ) : (
@@ -181,8 +180,7 @@ export default function NoticeCreateView() {
                   </p>
                 )}
               </div>
-            </div>
-            <div className={isPreview ? "hidden" : ""}>
+            ) : (
               <Textarea
                 title="공지 내용을 입력해주세요 (마크다운 문법 지원)"
                 value={content}
@@ -191,8 +189,10 @@ export default function NoticeCreateView() {
                 }
                 rows={8}
                 maxLength={MAX_CONTENT_LENGTH}
+                textClassName="text-[13px] leading-relaxed text-gray-700"
+                className="h-[200px]"
               />
-            </div>
+            )}
           </div>
 
           {/* 공지 대상 */}

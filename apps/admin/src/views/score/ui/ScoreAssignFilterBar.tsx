@@ -5,6 +5,8 @@ import { Chevron, GrantButton } from "@repo/ui";
 import type { GrantStatus, Grade } from "@repo/ui";
 import type { ScoreFilter } from "./constants";
 import TeamFilter from "@/features/team-filter/ui/TeamFilter";
+import EvaluationPeriodBadge from "./EvaluationPeriodBadge";
+import type { EvaluationPeriodPayload } from "./evaluationPeriod";
 
 const GRADE_OPTIONS: { value: Grade; label: string }[] = [
   { value: 1, label: "1학년" },
@@ -25,6 +27,9 @@ interface Props {
   teamNames: string[];
   teamQuery: string;
   onTeamQueryChange: (query: string) => void;
+  isPeriodSet: boolean;
+  // 새로고침 전 같은 세션에서 방금 확인된 값 — 있으면 배지에 정확한 날짜·시간을 보여준다.
+  confirmedPeriod?: EvaluationPeriodPayload | null;
 }
 
 export default function ScoreAssignFilterBar({
@@ -35,6 +40,8 @@ export default function ScoreAssignFilterBar({
   teamNames,
   teamQuery,
   onTeamQueryChange,
+  isPeriodSet,
+  confirmedPeriod,
 }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -89,6 +96,7 @@ export default function ScoreAssignFilterBar({
           />
         );
       })}
+      {isPeriodSet && <EvaluationPeriodBadge period={confirmedPeriod} />}
       <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-x-4 text-xs text-gray-500">
         {LEGEND.map(({ dot, label }) => (
           <span key={label} className="flex items-center gap-1.5">

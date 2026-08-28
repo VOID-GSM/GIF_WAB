@@ -109,7 +109,7 @@ export function MemberSearchInput({ grade, owner, value, onChange }: MemberSearc
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="팀원을 검색하세요"
-                className="w-full bg-transparent text-xs outline-none placeholder:text-gray-400"
+                className="w-full bg-transparent text-xs text-gray-900 outline-none placeholder:text-gray-400"
               />
             </div>
             <div className="mx-3.5 h-px bg-gray-200" />
@@ -124,7 +124,7 @@ export function MemberSearchInput({ grade, owner, value, onChange }: MemberSearc
                     <button
                       type="button"
                       onClick={() => handleAdd(user)}
-                      className="w-full px-3.5 py-3 text-left text-xs hover:bg-gray-50"
+                      className="w-full px-3.5 py-3 text-left text-xs text-gray-900 hover:bg-gray-50"
                     >
                       {user.studentNumber} {user.name}
                     </button>

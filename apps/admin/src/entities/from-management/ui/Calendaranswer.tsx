@@ -65,7 +65,9 @@ function EventModal({
               className="w-4 h-4 rounded-full flex-shrink-0"
               style={{ backgroundColor: hex }}
             />
-            <span className="text-[12px] font-regular">{event.title}</span>
+            <span className="text-[12px] font-regular text-gray-900">
+              {event.title}
+            </span>
           </div>
 
           <div className="text-right text-gray-500 text-[10px] font-regular">
@@ -106,7 +108,7 @@ function DayCell({
     return (
       <div className={cell}>
         <span
-          className={`flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-[20px]
+          className={`flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-[20px] text-gray-900
           ${isToday ? "bg-yellow-400 rounded-full" : ""}
         `}
         >
@@ -125,7 +127,7 @@ function DayCell({
     return (
       <div className={cell} onClick={() => onEventClick(event)}>
         <span
-          className="flex items-center justify-center w-7 h-7 sm:w-[35px] sm:h-[35px] text-sm sm:text-[20px] rounded-full cursor-pointer"
+          className="flex items-center justify-center w-7 h-7 sm:w-[35px] sm:h-[35px] text-sm sm:text-[20px] rounded-full cursor-pointer text-gray-900"
           style={{ border: `1px solid ${hex}` }}
         >
           {day}
@@ -136,7 +138,7 @@ function DayCell({
 
   return (
     <div
-      className={`flex items-center justify-center h-7 sm:h-[35px] w-full text-sm sm:text-[20px] cursor-pointer
+      className={`flex items-center justify-center h-7 sm:h-[35px] w-full text-sm sm:text-[20px] cursor-pointer text-gray-900
         ${isStart ? "rounded-l-full" : ""}
         ${isEnd ? "rounded-r-full" : ""}
       `}
@@ -204,7 +206,9 @@ export default function CalendarAnswer({
         />
       )}
 
-      <div className="text-center text-lg sm:text-[20px] mb-4">{year}</div>
+      <div className="text-center text-lg sm:text-[20px] mb-4 text-gray-900">
+        {year}
+      </div>
 
       <div className="flex items-center justify-between mb-[10px]">
         <button
@@ -237,7 +241,7 @@ export default function CalendarAnswer({
           {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
             <div
               key={i}
-              className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 mx-auto text-sm sm:text-[20px] font-semibold"
+              className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 mx-auto text-sm sm:text-[20px] font-semibold text-gray-900"
             >
               {d}
             </div>

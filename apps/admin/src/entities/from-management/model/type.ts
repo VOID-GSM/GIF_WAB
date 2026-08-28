@@ -24,6 +24,8 @@ export interface FormField {
   description: string;
   type: "TEXT" | "FILE" | "CALENDAR";
   orderIndex: number;
+  /** 필수 항목 여부 — required 를 내려주지 않는 구버전 양식은 필수로 간주한다 */
+  required?: boolean;
   allowedExtensions?: string[]; // FILE 타입에서 client 가 제출 가능한 확장자 + "url"(외부 링크 제출 허용 플래그)
 }
 
@@ -60,5 +62,7 @@ export interface AdminSubmitDetail {
   teamName: string;
   submittedByUserId: number;
   submittedAt: string;
+  /** 기한 내 제출 여부 — 담당(MASTER)·VOID 계정이 준수/미준수를 직접 바꿀 수 있다 */
+  deadlineComplied: boolean;
   answers: SubmitAnswer[];
 }

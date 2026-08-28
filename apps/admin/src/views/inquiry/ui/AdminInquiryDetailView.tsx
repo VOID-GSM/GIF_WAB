@@ -233,7 +233,7 @@ export default function AdminInquiryDetailView({
                   </span>
                 </div>
                 {isPreview ? (
-                  <div className="min-h-[144px] rounded-[10px] border border-gray-200 bg-white px-3.5 py-3">
+                  <div className="h-[150px] overflow-y-auto rounded-[10px] border border-gray-200 bg-white px-[16px] py-[13px]">
                     {answerContent.trim() ? (
                       <Markdown content={answerContent} />
                     ) : (
@@ -251,6 +251,8 @@ export default function AdminInquiryDetailView({
                     }
                     rows={6}
                     maxLength={MAX_ANSWER_LENGTH}
+                    textClassName="text-[13px] leading-relaxed text-gray-700"
+                    className="h-[150px]"
                   />
                 )}
                 <div className="mt-1 flex items-center justify-end">

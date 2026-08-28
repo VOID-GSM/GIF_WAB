@@ -2,7 +2,10 @@
 
 import { Close, Textarea, FileUpload, splitAllowedExtensions } from "@repo/ui";
 import CalendarAnswer from "@/entities/from-management/ui/Calendaranswer";
-import type { AdminFormDetail, FormField } from "@/entities/from-management/model/type";
+import type {
+  AdminFormDetail,
+  FormField,
+} from "@/entities/from-management/model/type";
 import {
   formatDeadlineDate,
   formatDeadlineTime,
@@ -19,13 +22,23 @@ function PreviewField({ field }: { field: FormField }) {
     field.allowedExtensions,
   );
 
+  // required 를 내려주지 않는 구버전 양식은 필수로 간주한다.
+  const required = field.required ?? true;
+
   return (
     <div className="flex flex-col rounded-[10px] border-t-5 border-yellow-600 bg-white px-4 py-5 shadow-new sm:px-7 sm:py-6">
       <span className="text-[16px] font-semibold text-gray-900 sm:text-[18px]">
         {field.title}
+        {required ? (
+          <span className="ml-1 text-red-500">*</span>
+        ) : (
+          <span className="ml-2 text-[13px] font-medium text-gray-400">
+            (선택)
+          </span>
+        )}
       </span>
       {field.description && (
-        <span className="pb-3 pt-1 text-sm font-medium text-gray-500 sm:text-base">
+        <span className="pb-3 pt-1 text-sm font-medium text-gray-500 sm:text-base whitespace-pre-wrap">
           {field.description}
         </span>
       )}

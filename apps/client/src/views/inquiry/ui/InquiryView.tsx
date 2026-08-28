@@ -109,6 +109,7 @@ export default function InquiryView() {
                 setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))
               }
               maxLength={MAX_TITLE_LENGTH}
+              textClassName="text-[13px] text-gray-700"
             />
           </div>
 
@@ -150,7 +151,7 @@ export default function InquiryView() {
               </span>
             </div>
             {isPreview ? (
-              <div className="min-h-[144px] rounded-[10px] border border-gray-200 bg-white px-3.5 py-3">
+              <div className="h-[150px] overflow-y-auto rounded-[10px] border border-gray-200 bg-white px-[16px] py-[13px]">
                 {content.trim() ? (
                   <Markdown content={content} />
                 ) : (
@@ -168,6 +169,8 @@ export default function InquiryView() {
                 }
                 rows={6}
                 maxLength={MAX_CONTENT_LENGTH}
+                textClassName="text-[13px] leading-relaxed text-gray-700"
+                className="h-[150px]"
               />
             )}
           </div>

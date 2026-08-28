@@ -8,6 +8,7 @@ export const URL_SUBMISSION_FLAG = "url";
 export const ALLOWED_EXTENSION_OPTIONS = [
   "pdf",
   "hwp",
+  "hwpx",
   "docx",
   "pptx",
   "xlsx",

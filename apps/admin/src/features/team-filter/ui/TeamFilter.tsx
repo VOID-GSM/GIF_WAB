@@ -8,6 +8,8 @@ interface TeamFilterProps {
   value: string;
   onChange: (query: string) => void;
   placeholder?: string;
+  // 주변 요소와 겹치는 화면에서 검색창 너비만 좁혀야 할 때 오버라이드한다.
+  widthClassName?: string;
 }
 
 // 팀명을 입력해 실시간으로 목록을 좁히거나, 드롭다운에서 팀을 직접 선택할 수 있는 검색형 필터
@@ -16,6 +18,7 @@ export default function TeamFilter({
   value,
   onChange,
   placeholder = "팀명 검색",
+  widthClassName = "w-[140px] sm:w-[200px]",
 }: TeamFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,7 +38,7 @@ export default function TeamFilter({
   const suggestions = teamNames.filter((name) => matchesTeamQuery(name, value));
 
   return (
-    <div ref={containerRef} className="relative w-[140px] sm:w-[200px]">
+    <div ref={containerRef} className={`relative ${widthClassName}`}>
       <input
         type="text"
         value={value}

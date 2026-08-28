@@ -1,0 +1,238 @@
+name: PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: AI 코드 리뷰 후 라인별 코멘트 남기기
+        uses: actions/github-script@v7
+        env:
+          # Gemini 모델. 필요하면 다른 모델로 교체 가능.
+          MODEL: gemini-3.6-flash
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const prTitle = context.payload.pull_request.title || '';
+            const prBody = context.payload.pull_request.body || '';
+
+            // ── 1) 이번 PR에서 변경된 파일(diff) 가져오기 ──────────────────────────
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+
+            const changed = files.filter(f => f.patch); // 바이너리 등 patch 없는 파일 제외
+
+            if (changed.length === 0) {
+              console.log('리뷰할 변경분이 없습니다.');
+              return;
+            }
+
+            // ── 1-1) 이 봇이 이전 커밋들에서 이미 남긴 코멘트 위치를 파악한다 ──────────
+            //     커밋을 새로 푸시할 때마다 diff 전체를 다시 분석하다 보니, 아직
+            //     고쳐지지 않은 기존 문제까지 매번 새 코멘트로 중복 등록되는 걸 막는다.
+            const existingComments = await github.paginate(github.rest.pulls.listReviewComments, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+
+            const alreadyCommented = new Set(
+              existingComments
+                .filter(c => c.user?.type === 'Bot')
+                .map(c => `${c.path}:${c.line ?? c.original_line}`)
+            );
+
+            // ── 2) 각 파일의 diff에서 "실제로 코멘트를 달 수 있는 새 라인 번호" 집합을 만든다 ──
+            //     GitHub 라인 코멘트는 diff에 나타난 라인에만 달 수 있으므로,
+            //     AI가 준 라인 번호를 이 집합과 대조해서 검증한다.
+            function collectValidLines(patch) {
+              const valid = new Set();
+              let currentNewLine = 0;
+              for (const line of patch.split('\n')) {
+                const hunk = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+                if (hunk) {
+                  currentNewLine = parseInt(hunk[1], 10);
+                  continue;
+                }
+                if (line.startsWith('+') && !line.startsWith('+++')) {
+                  valid.add(currentNewLine);
+                  currentNewLine++;
+                } else if (line.startsWith('-')) {
+                  continue;
+                } else if (!line.startsWith('\\')) {
+                  currentNewLine++;
+                }
+              }
+              return valid;
+            }
+
+            const validLinesByFile = {};
+            let diffForPrompt = '';
+            for (const f of changed) {
+              validLinesByFile[f.filename] = collectValidLines(f.patch);
+              diffForPrompt += `\n--- ${f.filename} ---\n${f.patch}\n`;
+            }
+
+            // 프롬프트 토큰 절약을 위해 너무 긴 diff는 잘라낸다
+            const MAX_DIFF_CHARS = 12000;
+            if (diffForPrompt.length > MAX_DIFF_CHARS) {
+              diffForPrompt = diffForPrompt.slice(0, MAX_DIFF_CHARS) + '\n... (이하 생략) ...';
+            }
+
+            // ── 3) Gemini API 호출 ────────────────────────────────────────────
+            const systemPrompt = `너는 숙련된 코드 리뷰어다. 아래 4가지 관점으로만 diff를 검토한다.
+            1. 버그/로직 오류
+            2. 스타일/컨벤션
+            3. 보안 취약점
+            4. 성능/구조
+
+            반드시 각 파일의 diff에 "+"로 추가된 라인에 대해서만 코멘트를 남겨라(삭제된 라인이나 컨텍스트 라인은 대상 아님).
+            문제가 없으면 코멘트를 만들지 마라. 과도하게 사소한 지적은 하지 마라.
+
+            comment에는 반드시 "왜 문제인지"와 "어떻게 고치면 되는지"를 함께 한국어로 설명해라. 지적만 하고 끝내지 마라.
+            그 문제가 된 라인 하나만 고치면 해결되는 경우, suggestion 필드에 그 라인을 대체할 코드 한 줄(들여쓰기 포함, 그 라인 자체만)을 넣어라.
+            줄 하나로 해결되지 않거나(여러 라인에 걸친 수정, 파일 구조 변경 등) 확신이 없으면 suggestion은 생략해라(null).
+
+            출력은 다른 설명 없이 아래 형식의 JSON 배열 하나만 출력해라:
+            [{"file": "경로", "line": 새_파일_기준_라인번호, "category": "bug|style|security|performance", "comment": "문제 원인과 해결 방법을 함께 한국어로 설명", "suggestion": "이 라인을 대체할 코드 한 줄 또는 null"}]
+            찾은 문제가 하나도 없으면 빈 배열 []을 출력해라.`;
+
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+            // Gemini가 일시적으로 과부하(503)이거나 속도 제한(429)에 걸리면
+            // 몇 초 대기 후 자동으로 재시도한다. 그래도 안 되면 그때는 진짜로 실패시킨다.
+            async function callGeminiWithRetry(payload, maxRetries = 3) {
+              let lastError;
+              for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                const response = await fetch(endpoint, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                  return await response.json();
+                }
+
+                const text = await response.text();
+                lastError = new Error(`Gemini 호출 실패 (${response.status}): ${text}`);
+
+                if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                  const waitMs = attempt * 5000; // 5초, 10초 ...
+                  console.log(`Gemini 일시 장애(${response.status}), ${waitMs / 1000}초 후 재시도 (${attempt}/${maxRetries})`);
+                  await new Promise(r => setTimeout(r, waitMs));
+                  continue;
+                }
+
+                throw lastError;
+              }
+              throw lastError;
+            }
+
+            const result = await callGeminiWithRetry({
+              system_instruction: { parts: [{ text: systemPrompt }] },
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{
+                    text: `PR 제목: ${prTitle}\nPR 설명:\n${prBody || '(작성되지 않음)'}\n\n다음은 이 PR의 diff다. PR 제목/설명에 담긴 의도를 참고해서 리뷰해라:\n${diffForPrompt}`,
+                  }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                responseMimeType: 'application/json',
+              },
+            });
+
+            const rawContent = result.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]';
+
+            // 모델이 코드블록(```json ... ```)으로 감싸는 경우 대비
+            const jsonMatch = rawContent.match(/```json\s*([\s\S]*?)\s*```/) || rawContent.match(/```\s*([\s\S]*?)\s*```/);
+            const jsonText = jsonMatch ? jsonMatch[1] : rawContent;
+
+            let aiComments;
+            try {
+              aiComments = JSON.parse(jsonText);
+            } catch (e) {
+              console.log('AI 응답을 JSON으로 파싱하지 못했습니다:', rawContent);
+              return;
+            }
+
+            if (!Array.isArray(aiComments) || aiComments.length === 0) {
+              console.log('AI가 지적할 문제를 찾지 못했습니다.');
+              return;
+            }
+
+            // ── 4) diff 범위 밖 라인은 걸러내고, 유효한 것만 코멘트로 변환 ────────────
+            const categoryLabel = {
+              bug: '🐛 버그/로직',
+              style: '🎨 스타일/컨벤션',
+              security: '🔒 보안',
+              performance: '⚡ 성능/구조',
+            };
+
+            const comments = [];
+            const skipped = [];
+
+            for (const c of aiComments) {
+              const validLines = validLinesByFile[c.file];
+              if (!validLines) {
+                skipped.push({ ...c, reason: '해당 파일이 diff에 없음' });
+                continue;
+              }
+              if (!validLines.has(c.line)) {
+                skipped.push({ ...c, reason: 'diff 범위 밖 라인' });
+                continue;
+              }
+              if (alreadyCommented.has(`${c.file}:${c.line}`)) {
+                skipped.push({ ...c, reason: '이미 이전 커밋에서 같은 위치에 코멘트를 남김' });
+                continue;
+              }
+              let body = `${categoryLabel[c.category] || '💬 리뷰'}\n${c.comment}`;
+              // AI가 한 줄짜리 수정안을 준 경우, GitHub의 "제안 변경"(suggestion) 블록으로
+              // 붙여준다. 리뷰어가 버튼 한 번으로 바로 그 수정을 커밋에 반영할 수 있다.
+              if (c.suggestion && typeof c.suggestion === 'string' && c.suggestion.trim() !== '') {
+                body += `\n\n\`\`\`suggestion\n${c.suggestion}\n\`\`\``;
+              }
+
+              comments.push({
+                path: c.file,
+                line: c.line,
+                body,
+              });
+            }
+
+            if (skipped.length > 0) {
+              console.log(`유효하지 않아 건너뛴 코멘트 ${skipped.length}개:`, JSON.stringify(skipped, null, 2));
+            }
+
+            if (comments.length === 0) {
+              console.log('diff 범위 안에서 남길 수 있는 코멘트가 없습니다.');
+              return;
+            }
+
+            // ── 5) 라인별 리뷰 코멘트 등록 ──────────────────────────────────────
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number,
+              event: 'COMMENT',
+              comments,
+            });
+
+            console.log(`코멘트 ${comments.length}개 작성 완료.`);

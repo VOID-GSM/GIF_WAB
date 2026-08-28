@@ -1,4 +1,4 @@
-import { getCookieValue } from "@repo/lib";
+import { apiClient, getCookieValue } from "@repo/lib";
 import {
   AdminForm,
   AdminFormDetail,
@@ -54,6 +54,18 @@ export const getAdminFormDetail = async (
     return detail;
   }
   return fetchWithAuth<AdminFormDetail>(`/api/form/${formId}`);
+};
+
+// 제출물의 마감 준수 여부 변경 (아이디어페스티벌 담당·VOID 계정 전용)
+// 준수 → 미준수, 미준수 → 준수 양방향으로 바꿀 수 있다.
+export const patchDeadlineCompliance = async (
+  submitId: number,
+  deadlineComplied: boolean,
+): Promise<void> => {
+  await apiClient.patch(
+    `/api/form/admin/submit/${submitId}/deadline-compliance`,
+    { deadlineComplied },
+  );
 };
 
 // 양식별 전체 제출 답변 (formId = 템플릿 ID)

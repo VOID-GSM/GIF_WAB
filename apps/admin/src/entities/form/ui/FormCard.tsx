@@ -70,9 +70,9 @@ export default function FormCard({
         )}
       </div>
 
-      {/* 관리 (수정 / 삭제) — 공지되면 수정이 사라져도 삭제가 밀리지 않도록 수정 자리를 고정 폭으로 유지 */}
+      {/* 관리 (수정 / 삭제) — 수정 권한이 없어도 삭제가 밀리지 않도록 수정 자리를 고정 폭으로 유지 */}
       <div className="flex items-center justify-start gap-3">
-        {announced || !onEdit ? (
+        {!onEdit ? (
           <span className="h-8 w-14" aria-hidden />
         ) : (
           <button

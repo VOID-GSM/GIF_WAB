@@ -4,7 +4,7 @@ export interface FormSummary {
   title: string;
   /** 제출 마감일 (YYYY-MM-DD) */
   deadline: string;
-  /** 공지 여부 — true면 client에 노출되며 수정이 불가능하다 */
+  /** 공지 여부 — true면 client에 노출된다. 공지 후에도 담당(MASTER)은 수정할 수 있다 */
   announced: boolean;
   /** 제출물 존재 여부 */
   submitted: boolean;

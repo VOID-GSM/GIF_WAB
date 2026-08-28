@@ -67,3 +67,10 @@ export interface GetProjectFieldAverageResponse {
   communityAverage: number;
   grandTotalAverage: number;
 }
+
+export type ScorePeriodCategory = "MAJOR" | "REPORT" | "SOCIAL";
+
+export interface PostScorePeriodRequest {
+  category: ScorePeriodCategory;
+  startDate: string; // ISO 8601
+}

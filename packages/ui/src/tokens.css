@@ -149,6 +149,29 @@
 .dark .bg-green-50 {
   background-color: rgb(125 220 30 / 0.1);
 }
+.dark .bg-green-100 {
+  background-color: rgb(125 220 30 / 0.15);
+}
+.dark .text-green-700 {
+  color: rgb(134 239 172);
+}
+
+.dark .bg-blue-100 {
+  background-color: rgb(96 165 250 / 0.15);
+}
+.dark .text-blue-700 {
+  color: rgb(147 197 253);
+}
+
+.dark .bg-red-50 {
+  background-color: rgb(239 68 68 / 0.12);
+}
+.dark .text-red-700 {
+  color: rgb(252 165 165);
+}
+.dark .text-red-600 {
+  color: rgb(252 165 165);
+}
 
 .dark .text-black {
   color: var(--color-white);
@@ -163,7 +186,9 @@
  * 그 위의 text-black/text-gray-900까지 위 규칙에 걸려 흰 글자로 바뀌면 대비가 깨진다.
  */
 .dark .bg-yellow-600.text-black,
-.dark .bg-yellow-600.text-gray-900 {
+.dark .bg-yellow-600.text-gray-900,
+.dark .bg-yellow-300.text-black,
+.dark .bg-yellow-300.text-gray-900 {
   color: var(--color-gray-900);
 }
 .dark .text-gray-800 {
@@ -208,6 +233,18 @@
 }
 .dark .text-orange-700 {
   color: var(--color-orange-300);
+}
+.dark .placeholder\:text-gray-500::placeholder {
+  color: var(--color-gray-400);
+}
+
+/*
+ * 예외: bg-yellow-600과 동일한 이유로, bg-yellow-400(캘린더 오늘 날짜 표시 등) 위의
+ * 어두운 글자도 다크모드에서 흰 글자로 바뀌면 안 된다.
+ */
+.dark .bg-yellow-400.text-black,
+.dark .bg-yellow-400.text-gray-900 {
+  color: var(--color-gray-900);
 }
 
 .dark .border-gray-100 {

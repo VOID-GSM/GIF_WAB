@@ -109,6 +109,7 @@ export default function InquiryView() {
                 setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))
               }
               maxLength={MAX_TITLE_LENGTH}
+              textClassName="text-[13px] text-gray-700"
             />
           </div>
 
@@ -149,8 +150,8 @@ export default function InquiryView() {
                 {content.length}/{MAX_CONTENT_LENGTH}
               </span>
             </div>
-            <div className={isPreview ? "" : "hidden"}>
-              <div className="min-h-[144px] rounded-[10px] border border-gray-200 bg-white px-3.5 py-3">
+            {isPreview ? (
+              <div className="h-[150px] overflow-y-auto rounded-[10px] border border-gray-200 bg-white px-[16px] py-[13px]">
                 {content.trim() ? (
                   <Markdown content={content} />
                 ) : (
@@ -159,8 +160,7 @@ export default function InquiryView() {
                   </p>
                 )}
               </div>
-            </div>
-            <div className={isPreview ? "hidden" : ""}>
+            ) : (
               <Textarea
                 title="문의 내용을 자세히 입력해주세요 (마크다운 문법 지원)"
                 value={content}
@@ -169,8 +169,10 @@ export default function InquiryView() {
                 }
                 rows={6}
                 maxLength={MAX_CONTENT_LENGTH}
+                textClassName="text-[13px] leading-relaxed text-gray-700"
+                className="h-[150px]"
               />
-            </div>
+            )}
           </div>
 
           {/* 첨부파일 */}

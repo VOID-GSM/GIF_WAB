@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-const TEXT_MAX_LENGTH = 1000;
+const TEXT_MAX_LENGTH = 10000;
 
 interface TextFieldProps {
   fieldId: number;
@@ -39,7 +39,7 @@ export default function TextField({
     <>
       <textarea
         ref={textareaRef}
-        className="min-h-20 w-full break-words border border-gray-80 rounded-[10px] p-[15px] font-medium outline-none resize-none placeholder:text-gray-500"
+        className="min-h-20 w-full break-words border border-gray-80 rounded-[10px] p-[15px] font-medium text-gray-800 outline-none resize-none overflow-hidden placeholder:text-gray-500"
         placeholder="답변을 입력하세요"
         value={value}
         maxLength={TEXT_MAX_LENGTH}

@@ -136,7 +136,7 @@ export default function EventFormModal({
               placeholder="일정을 입력해 주세요"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-gray-500 rounded-[4px] px-3 py-2 mb-1 text-[12px] font-regular outline-none placeholder:text-gray-500"
+              className="w-full border border-gray-500 rounded-[4px] px-3 py-2 mb-1 text-[12px] font-regular text-black outline-none placeholder:text-gray-500"
             />
 
             <div className="text-[10px] text-gray-500 font-regular text-right">

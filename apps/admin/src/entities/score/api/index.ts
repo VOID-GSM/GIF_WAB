@@ -9,6 +9,7 @@ import type {
   PatchSocialScoreRequest,
   GetScoreNoticeResponse,
   GetProjectFieldAverageResponse,
+  PostScorePeriodRequest,
 } from "../model/types";
 
 export const getMajorScore = (projectId: number) =>
@@ -46,3 +47,6 @@ export const getScoreNotice = () =>
 
 export const getAllProjectFieldAverages = () =>
   apiClient.get<GetProjectFieldAverageResponse[]>("/api/score/projects/averages");
+
+export const postScorePeriod = (body: PostScorePeriodRequest) =>
+  apiClient.post<void>("/api/score/period", body);

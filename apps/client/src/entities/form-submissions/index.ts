@@ -12,7 +12,11 @@ export { useGetFormSubmitters } from "./hooks/useGetFormSubmitters";
 export { useGetFormDetail } from "./hooks/useGetFormDetail";
 export { useGetProjectSchedule } from "./hooks/useGetProjectSchedule";
 
+export { isFieldRequired } from "./lib/isFieldRequired";
+
 export type {
+  FormDetailField,
+  GetFormDetailResponse,
   FormAnswerItem,
   PostFormSubmitRequest,
   PostFormUploadResponse,

@@ -47,7 +47,7 @@ export default function EventViewModal({
               className="w-4 h-4 rounded-full flex-shrink-0"
               style={{ backgroundColor: colorVar }}
             />
-            <span className="text-[12px]">{event.title}</span>
+            <span className="text-[12px] text-gray-900">{event.title}</span>
           </div>
 
           <div className="text-right text-gray-500 text-[10px]">

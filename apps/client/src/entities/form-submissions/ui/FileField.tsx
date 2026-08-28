@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, DragEvent, useState } from "react";
 import { toast } from "sonner";
 import {
   Upload,
@@ -49,6 +49,7 @@ export default function FileField({
 }: FileFieldProps) {
   const { mutate: deleteUpload, isPending: isDeleting } = useDeleteFormUpload();
   const { mutate: download, isPending: isDownloading } = useDownloadFile();
+  const [isDragging, setIsDragging] = useState(false);
 
   // admin 이 확장자·URL 허용 여부를 지정한 경우에만 제한한다.
   const { extensions, allowUrl } = splitAllowedExtensions(allowedExtensions);
@@ -87,22 +88,45 @@ export default function FileField({
     </span>
   ) : null;
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
-    if (hasExtensionLimit && !extensions.includes(getExtension(selected.name))) {
+  // 확장자·용량 검증 — click으로 고른 파일과 드래그해서 놓은 파일 모두 여기를 거친다.
+  const validateAndSetFile = (selected: File) => {
+    if (
+      hasExtensionLimit &&
+      !extensions.includes(getExtension(selected.name))
+    ) {
       toast.error(
         `허용된 파일 형식이 아닙니다. (${extensions.join(", ")} 형식만 업로드 가능)`,
       );
-      e.target.value = "";
       return;
     }
     if (selected.size > MAX_FILE_SIZE) {
       toast.error("파일 용량이 커서 업로드할 수 없습니다. (최대 10MB)");
-      e.target.value = "";
       return;
     }
     onChange(fieldId, selected);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+    if (!selected) return;
+    validateAndSetFile(selected);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const dropped = e.dataTransfer.files?.[0];
+    if (dropped) validateAndSetFile(dropped);
   };
 
   // 제출된 링크를 읽기 전용으로 보여주는 카드
@@ -182,7 +206,16 @@ export default function FileField({
 
     return (
       <div>
-        <label className="flex items-center justify-center w-full border-2 border-dashed border-gray-600 bg-gray-100 rounded-[10px] cursor-pointer hover:border-gray-600/60 hover:bg-gray-100/60 transition-colors">
+        <label
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`flex items-center justify-center w-full border-2 border-dashed rounded-[10px] cursor-pointer transition-colors ${
+            isDragging
+              ? "border-yellow-600 bg-yellow-50"
+              : "border-gray-600 bg-gray-100 hover:border-gray-600/60 hover:bg-gray-100/60"
+          }`}
+        >
           <input
             type="file"
             className="hidden"
@@ -224,7 +257,9 @@ export default function FileField({
           placeholder="https://www.canva.com/design/..."
           onChange={(e) => onUrlChange?.(fieldId, e.target.value)}
           className={`w-full rounded-[10px] border px-4 py-3 text-[14px] text-gray-900 outline-none transition-colors placeholder:text-gray-400 bg-white ${
-            isInvalid ? "border-red-500" : "border-gray-80 focus:border-gray-600"
+            isInvalid
+              ? "border-red-500"
+              : "border-gray-80 focus:border-gray-600"
           }`}
         />
         <span

@@ -7,3 +7,4 @@ export * from "./hooks/useSocialScore";
 export * from "./hooks/useScoreNotice";
 export * from "./hooks/useProjectFieldAverages";
 export * from "./hooks/useScoreStatus";
+export * from "./hooks/useScorePeriod";

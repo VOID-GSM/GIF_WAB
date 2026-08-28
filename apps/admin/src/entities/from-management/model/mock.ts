@@ -203,6 +203,7 @@ export const mockSubmitDetailMap: Record<number, AdminSubmitDetail[]> = {
       teamName: "VOID",
       submittedByUserId: 101,
       submittedAt: "2026-06-10T09:00:00.000Z",
+      deadlineComplied: true,
       answers: [
         fileAnswer(
           1,
@@ -238,6 +239,7 @@ export const mockSubmitDetailMap: Record<number, AdminSubmitDetail[]> = {
       teamName: "NOVA",
       submittedByUserId: 103,
       submittedAt: "2026-06-11T10:30:00.000Z",
+      deadlineComplied: true,
       answers: [
         fileAnswer(1, "팀 관련 사이트 QR코드", "/mock/nova_report.pdf", 1536000),
         textAnswer(2, "프로젝트 이름", "NOVA는 별자리를 활용한 앱 서비스입니다."),
@@ -249,6 +251,7 @@ export const mockSubmitDetailMap: Record<number, AdminSubmitDetail[]> = {
       teamName: "PIXEL",
       submittedByUserId: 104,
       submittedAt: "2026-06-12T08:00:00.000Z",
+      deadlineComplied: true,
       answers: [
         fileAnswer(1, "팀 관련 사이트 QR코드", "/mock/pixel_qr.pdf", 512000),
         textAnswer(2, "프로젝트 이름", "PIXEL - 픽셀아트 공유 플랫폼"),
@@ -275,6 +278,7 @@ export const mockSubmitDetailMap: Record<number, AdminSubmitDetail[]> = {
       teamName: "ALPHA",
       submittedByUserId: 105,
       submittedAt: "2026-06-13T14:00:00.000Z",
+      deadlineComplied: true,
       answers: [
         fileAnswer(1, "배너 이미지", "/mock/alpha_banner.png", 3145728),
         textAnswer(2, "배너 설명 문구", "미래를 여는 아이디어, ALPHA와 함께"),
@@ -286,6 +290,7 @@ export const mockSubmitDetailMap: Record<number, AdminSubmitDetail[]> = {
       teamName: "GAMMA",
       submittedByUserId: 107,
       submittedAt: "2026-06-14T11:00:00.000Z",
+      deadlineComplied: true,
       answers: [
         fileAnswer(1, "배너 이미지", "/mock/gamma_banner.pdf", 4194304),
         textAnswer(

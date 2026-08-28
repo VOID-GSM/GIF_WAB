@@ -44,11 +44,11 @@ export default function ScoreAreaView({ area, projectId, teamName }: Props) {
   }
 
   return (
-    <div className="h-dvh bg-background flex flex-col items-center justify-center px-4 sm:px-6">
+    <div className="min-h-dvh bg-background flex flex-col items-center justify-center px-4 py-8 sm:px-6">
       <div className="w-full max-w-[980px] flex flex-col gap-5">
         <ScoreAreaHeader onBack={() => router.back()} teamName={teamName} area={area} />
         <div className="bg-white rounded-2xl border border-gray-200 shadow-new overflow-hidden p-4 sm:p-7 md:p-10 flex flex-col">
-          <div className="flex flex-col min-h-[400px]">
+          <div className="flex flex-col">
             <ScoreAreaTable
               isLoading={isQueryLoading}
               rows={rows}

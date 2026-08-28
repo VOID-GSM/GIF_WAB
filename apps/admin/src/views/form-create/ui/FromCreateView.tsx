@@ -7,7 +7,10 @@ import { toast } from "sonner";
 
 import { usePostForm, useAnnounceForm } from "@/entities/form-create";
 import type { PostFormRequestField } from "@/entities/form-create";
+import { useUpdateForm } from "@/entities/form-edit";
+import type { UpdateFormField } from "@/entities/form-edit";
 import { useGetMyInfo } from "@/entities/mypage";
+import { useFieldReorder } from "@/features/form-field-reorder";
 
 const FORM_TITLE_MAX_LENGTH = 50;
 
@@ -19,13 +22,18 @@ type FieldWithId = {
   description: string;
   type: FieldType;
   orderIndex: number;
+  required: boolean;
   allowedExtensions: string[];
 };
+
+// 새 항목은 기본적으로 필수 — admin 이 토글로 선택 항목으로 바꿀 수 있다.
+const DEFAULT_REQUIRED = true;
 
 export default function FormCreateView() {
   const router = useRouter();
   const { mutate: createForm, isPending: isSaving } = usePostForm();
   const { mutate: announce, isPending: isAnnouncing } = useAnnounceForm();
+  const { mutate: updateForm, isPending: isUpdating } = useUpdateForm();
 
   // 양식 생성은 아이디어페스티벌 담당(MASTER)만 가능 — 그 외 역할·에러는 목록으로 돌려보낸다.
   const { data: myInfo, isLoading: isMyInfoLoading, isError } = useGetMyInfo();
@@ -59,6 +67,19 @@ export default function FormCreateView() {
       description: f.description,
       type: f.type,
       orderIndex: f.orderIndex,
+      required: f.required,
+      ...(f.type === "FILE" ? { allowedExtensions: f.allowedExtensions } : {}),
+    }));
+
+  // 이미 저장된 초안(savedFormId)을 공지 직전에 최신 상태로 갱신할 때 사용.
+  // hasEmptyValue() 검증을 통과한 뒤에만 호출되므로 type이 ""인 필드는 없다.
+  const buildUpdateFields = (): UpdateFormField[] =>
+    fields.map((f) => ({
+      title: f.title,
+      description: f.description,
+      type: f.type as UpdateFormField["type"],
+      orderIndex: f.orderIndex,
+      required: f.required,
       ...(f.type === "FILE" ? { allowedExtensions: f.allowedExtensions } : {}),
     }));
 
@@ -69,9 +90,13 @@ export default function FormCreateView() {
       description: "",
       type: "TEXT",
       orderIndex: 0,
+      required: DEFAULT_REQUIRED,
       allowedExtensions: [],
     },
   ]);
+
+  const { draggingId, handleDragStart, handleDragEnter, handleDragEnd } =
+    useFieldReorder(setFields);
 
   const handleAddField = () => {
     setFields((prev) => [
@@ -82,6 +107,7 @@ export default function FormCreateView() {
         description: "",
         type: "",
         orderIndex: prev.length,
+        required: DEFAULT_REQUIRED,
         allowedExtensions: [],
       },
     ]);
@@ -119,6 +145,27 @@ export default function FormCreateView() {
       return;
     }
 
+    // 이미 저장된 초안이 있으면 새로 만들지 않고 같은 양식을 갱신한다.
+    // (매번 새로 생성하면 저장할 때마다 중복 양식이 쌓이고, 이전에 저장한
+    // 초안을 다시 열어봐도 이후 수정 내용이 반영되지 않는다.)
+    if (savedFormId) {
+      updateForm(
+        {
+          formId: savedFormId,
+          body: {
+            title: formTitle,
+            deadline: buildDeadline(),
+            fields: buildUpdateFields(),
+          },
+        },
+        {
+          onSuccess: () => toast.success("양식이 저장되었습니다."),
+          onError: () => toast.error("양식 저장에 실패했습니다."),
+        },
+      );
+      return;
+    }
+
     createForm(
       {
         title: formTitle,
@@ -146,7 +193,22 @@ export default function FormCreateView() {
     };
 
     if (savedFormId) {
-      doAnnounce(savedFormId);
+      // 저장 이후 수정한 내용(필수 여부 등)이 공지 시 함께 반영되도록
+      // 공지 전에 현재 상태로 먼저 갱신한다.
+      updateForm(
+        {
+          formId: savedFormId,
+          body: {
+            title: formTitle,
+            deadline: buildDeadline(),
+            fields: buildUpdateFields(),
+          },
+        },
+        {
+          onSuccess: () => doAnnounce(savedFormId),
+          onError: () => toast.error("양식 저장에 실패했습니다."),
+        },
+      );
     } else {
       createForm(
         {
@@ -238,6 +300,10 @@ export default function FormCreateView() {
             field={field}
             onChange={handleChange}
             onDelete={handleDeleteField}
+            onDragStart={handleDragStart}
+            onDragEnter={handleDragEnter}
+            onDragEnd={handleDragEnd}
+            isDragging={draggingId === field.id}
           />
         ))}
 
@@ -253,14 +319,14 @@ export default function FormCreateView() {
           <button
             className="flex w-full items-center justify-center py-3 font-medium border border-yellow-700 bg-white rounded-[10px] cursor-pointer disabled:opacity-50 dark:border-yellow-500 dark:text-gray-300"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || isUpdating}
           >
             저장하기
           </button>
           <button
             className="flex w-full items-center justify-center py-3 font-medium bg-yellow-600 rounded-[10px] cursor-pointer disabled:opacity-50"
             onClick={handleAnnounce}
-            disabled={isAnnouncing || isSaving}
+            disabled={isAnnouncing || isSaving || isUpdating}
           >
             공지하기
           </button>

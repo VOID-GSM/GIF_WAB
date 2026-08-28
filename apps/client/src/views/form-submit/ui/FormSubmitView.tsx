@@ -7,6 +7,7 @@ import {
   CalendarField,
   FileField,
   TextField,
+  isFieldRequired,
   type CalendarEvent,
 } from "@/entities/form-submissions/index";
 import { usePostFormSubmit } from "@/entities/form-submissions/hooks/usePostFormSubmit";
@@ -76,9 +77,11 @@ export default function FormSubmitView({ formId }: Props) {
   const handleSubmit = async () => {
     if (!formDetail?.fields || !projectId) return;
 
+    // 선택 항목(required=false)은 비워둔 채 제출할 수 있다.
     const errors: Record<number, string> = {};
     formDetail.fields.forEach((field) => {
       const fId = field.fieldId ?? field.id ?? 0;
+      if (!isFieldRequired(field)) return;
       if (field.type === "TEXT" && !textAnswers[fId]?.trim()) {
         errors[fId] = "필수 항목입니다.";
       }
@@ -100,7 +103,7 @@ export default function FormSubmitView({ formId }: Props) {
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      toast.error("모든 항목을 작성해주세요.");
+      toast.error("필수 항목을 모두 작성해주세요.");
       return;
     }
 
@@ -214,10 +217,10 @@ export default function FormSubmitView({ formId }: Props) {
       ) : (
         <div className="mx-auto flex flex-col w-full max-w-[560px] gap-4">
           <div className="flex flex-col gap-2">
-            <span className="flex justify-center text-[24px] font-semibold">
+            <span className="flex justify-center text-[24px] font-semibold text-gray-900">
               {formDetail.title}
             </span>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-medium">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-medium text-gray-900">
               <span>마감 날짜: {formatDeadlineDate(formDetail.deadline)}</span>
               {formatDeadlineTime(formDetail.deadline) && (
                 <span>마감 시간: {formatDeadlineTime(formDetail.deadline)}</span>
@@ -232,17 +235,27 @@ export default function FormSubmitView({ formId }: Props) {
               .map((field, index) => {
                 const fId = field.fieldId ?? field.id ?? index;
                 const error = fieldErrors[fId];
+                const required = isFieldRequired(field);
                 return (
                   <div
                     key={fId}
                     className="flex flex-col py-6 px-6 sm:py-8 sm:px-12 border-t-5 border-yellow-600 bg-white rounded-[10px] shadow-new"
                   >
-                    <span className="text-[20px] font-semibold pb-2">
+                    <span className="text-[20px] font-semibold pb-2 text-gray-900">
                       {field.title}
+                      {required ? (
+                        <span className="ml-1 text-red-500">*</span>
+                      ) : (
+                        <span className="ml-2 text-[14px] font-medium text-gray-400">
+                          (선택)
+                        </span>
+                      )}
                     </span>
-                    <span className="font-medium text-gray-500 pb-4">
-                      {field.description}
-                    </span>
+                    {field.description && (
+                      <span className="font-medium text-gray-500 pb-4 whitespace-pre-wrap">
+                        {field.description}
+                      </span>
+                    )}
 
                     {field.type === "TEXT" && (
                       <>
