@@ -1,3 +1,5 @@
+import { stripInvisibleChars } from "../../lib/sanitizeText";
+
 interface InputProps {
   title?: string;
   value?: string;
@@ -21,6 +23,22 @@ export default function Input({
   className = "",
   textClassName,
 }: InputProps) {
+  // 붙여넣기 등으로 들어온 보이지 않는 제어 문자를 부모에게 전달하기 전에 제거한다.
+  // 한글(IME) 조합 중에는 값을 건드리지 않는다 — 조합 세션이 깨질 수 있다.
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!(e.nativeEvent as InputEvent).isComposing) {
+      e.target.value = stripInvisibleChars(e.target.value);
+    }
+    onChange?.(e);
+  };
+
+  const handleCompositionEnd = (
+    e: React.CompositionEvent<HTMLInputElement>,
+  ) => {
+    e.currentTarget.value = stripInvisibleChars(e.currentTarget.value);
+    onCompositionEnd?.(e);
+  };
+
   return (
     <input
       className={`w-full py-[13px] px-[16px] border border-gray-200 rounded-[10px] placeholder:text-gray-500 outline-none
@@ -28,9 +46,9 @@ export default function Input({
       dark:focus:border-yellow-500 dark:[&:not(:placeholder-shown)]:border-yellow-500 ${textClassName || "font-medium text-black"} ${className}`}
       placeholder={title}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
       onCompositionStart={onCompositionStart}
-      onCompositionEnd={onCompositionEnd}
+      onCompositionEnd={handleCompositionEnd}
       maxLength={maxLength}
     />
   );
