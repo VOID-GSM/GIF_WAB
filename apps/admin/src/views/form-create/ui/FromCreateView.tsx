@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FormCard, Plus, DatePicker, TimePicker } from "@repo/ui";
+import {
+  FormCard,
+  Plus,
+  DatePicker,
+  TimePicker,
+  stripInvisibleChars,
+} from "@repo/ui";
 import { toast } from "sonner";
 
 import { usePostForm, useAnnounceForm } from "@/entities/form-create";
@@ -239,9 +245,7 @@ export default function FormCreateView() {
   if (!canCreate) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-5 text-gray-500 font-medium">
-        {isError
-          ? "정보를 불러오지 못했습니다."
-          : "양식 생성 권한이 없습니다."}
+        {isError ? "정보를 불러오지 못했습니다." : "양식 생성 권한이 없습니다."}
       </div>
     );
   }
@@ -264,7 +268,7 @@ export default function FormCreateView() {
               setFormTitle(
                 isTitleComposing.current
                   ? value
-                  : value.slice(0, FORM_TITLE_MAX_LENGTH),
+                  : stripInvisibleChars(value).slice(0, FORM_TITLE_MAX_LENGTH),
               );
             }}
             onCompositionStart={() => {
@@ -273,7 +277,10 @@ export default function FormCreateView() {
             onCompositionEnd={(e) => {
               isTitleComposing.current = false;
               setFormTitle(
-                e.currentTarget.value.slice(0, FORM_TITLE_MAX_LENGTH),
+                stripInvisibleChars(e.currentTarget.value).slice(
+                  0,
+                  FORM_TITLE_MAX_LENGTH,
+                ),
               );
             }}
           />

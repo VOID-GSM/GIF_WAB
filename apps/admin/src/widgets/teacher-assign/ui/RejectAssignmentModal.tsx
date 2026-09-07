@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { stripInvisibleChars } from "@repo/ui";
 
 interface RejectAssignmentModalProps {
   teamName: string;
@@ -21,6 +22,17 @@ export default function RejectAssignmentModal({
 }: RejectAssignmentModalProps) {
   const [reason, setReason] = useState("");
   const isReasonEmpty = reason.trim().length === 0;
+  // 한글(IME) 조합 중에는 값을 가공하지 않는다 — 조합 도중 문자열이 바뀌면
+  // composition 세션이 끊겨 글자가 누락되거나 자모가 분리될 수 있다.
+  const isComposing = useRef(false);
+
+  const applyReason = (raw: string) => {
+    setReason(
+      isComposing.current
+        ? raw
+        : stripInvisibleChars(raw).slice(0, REASON_MAX_LENGTH),
+    );
+  };
 
   // 모달이 떠 있는 동안 뒤 배경(body)이 스크롤되지 않게 막는다.
   useEffect(() => {
@@ -51,14 +63,23 @@ export default function RejectAssignmentModal({
         <div className="flex flex-col gap-1">
           <textarea
             value={reason}
-            onChange={(e) => setReason(e.target.value.slice(0, REASON_MAX_LENGTH))}
+            onChange={(e) => applyReason(e.target.value)}
+            onCompositionStart={() => {
+              isComposing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              isComposing.current = false;
+              applyReason(e.currentTarget.value);
+            }}
             placeholder="거절 사유를 입력해주세요"
             rows={3}
             maxLength={REASON_MAX_LENGTH}
             className="w-full resize-none rounded-[10px] border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition-all duration-200 focus:border-yellow-600 focus:ring-4 focus:ring-yellow-600/10"
           />
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400">거절 사유는 필수 입력입니다.</p>
+            <p className="text-xs text-gray-400">
+              거절 사유는 필수 입력입니다.
+            </p>
             <p className="text-xs text-gray-400">
               {reason.length}/{REASON_MAX_LENGTH}
             </p>
