@@ -63,6 +63,8 @@ export { default as GeneralSubject } from "./svg/GeneralSubject";
 export { default as MajorSubject } from "./svg/MajorSubject";
 export { default as Person } from "./svg/Person";
 
+export { stripInvisibleChars } from "./lib/sanitizeText";
+
 export type { NavItem } from "./widgets/Navbar/model/type";
 export type { NavbarProps } from "./widgets/Navbar/model/type";
 export type { SidebarProps } from "./widgets/Navbar/model/type";
