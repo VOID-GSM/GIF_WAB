@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "@repo/ui";
 import { NavbarProps } from "@repo/ui";
 import { Menu } from "@repo/ui";
+import NotificationBell from "../../Notification/ui/NotificationBell";
 import { useGetScoreNotice } from "@repo/lib";
 
 export default function Navbar({ navItems }: NavbarProps) {
@@ -26,6 +27,8 @@ export default function Navbar({ navItems }: NavbarProps) {
         >
           <Menu className="h-6 w-6 text-gray-600" />
         </button>
+
+        <NotificationBell align="right" className="ml-auto" />
       </div>
 
       {isSidebarOpen && (
