@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { stripInvisibleChars } from "@repo/ui";
 
 interface RejectAssignmentModalProps {
   teamName: string;
@@ -51,14 +52,20 @@ export default function RejectAssignmentModal({
         <div className="flex flex-col gap-1">
           <textarea
             value={reason}
-            onChange={(e) => setReason(e.target.value.slice(0, REASON_MAX_LENGTH))}
+            onChange={(e) =>
+              setReason(
+                stripInvisibleChars(e.target.value).slice(0, REASON_MAX_LENGTH),
+              )
+            }
             placeholder="거절 사유를 입력해주세요"
             rows={3}
             maxLength={REASON_MAX_LENGTH}
             className="w-full resize-none rounded-[10px] border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition-all duration-200 focus:border-yellow-600 focus:ring-4 focus:ring-yellow-600/10"
           />
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400">거절 사유는 필수 입력입니다.</p>
+            <p className="text-xs text-gray-400">
+              거절 사유는 필수 입력입니다.
+            </p>
             <p className="text-xs text-gray-400">
               {reason.length}/{REASON_MAX_LENGTH}
             </p>

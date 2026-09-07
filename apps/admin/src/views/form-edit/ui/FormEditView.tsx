@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FormCard, Plus, DatePicker } from "@repo/ui";
+import { FormCard, Plus, DatePicker, stripInvisibleChars } from "@repo/ui";
 import { toast } from "sonner";
 import { useUpdateForm, useGetFormById } from "@/entities/form-edit";
 import type { FormByIdResponse, UpdateFormField } from "@/entities/form-edit";
@@ -30,7 +30,8 @@ const DEFAULT_REQUIRED = true;
 // API는 "DATE"를 반환하지만 FormCard UI는 "CALENDAR"를 사용
 function toUiType(apiType: string): "TEXT" | "FILE" | "CALENDAR" | "" {
   if (apiType === "DATE") return "CALENDAR";
-  if (apiType === "TEXT" || apiType === "FILE" || apiType === "CALENDAR") return apiType;
+  if (apiType === "TEXT" || apiType === "FILE" || apiType === "CALENDAR")
+    return apiType;
   return "";
 }
 
@@ -167,7 +168,7 @@ function FormEditor({
               setFormTitle(
                 isTitleComposing.current
                   ? value
-                  : value.slice(0, FORM_TITLE_MAX_LENGTH),
+                  : stripInvisibleChars(value).slice(0, FORM_TITLE_MAX_LENGTH),
               );
             }}
             onCompositionStart={() => {
@@ -176,7 +177,10 @@ function FormEditor({
             onCompositionEnd={(e) => {
               isTitleComposing.current = false;
               setFormTitle(
-                e.currentTarget.value.slice(0, FORM_TITLE_MAX_LENGTH),
+                stripInvisibleChars(e.currentTarget.value).slice(
+                  0,
+                  FORM_TITLE_MAX_LENGTH,
+                ),
               );
             }}
           />
