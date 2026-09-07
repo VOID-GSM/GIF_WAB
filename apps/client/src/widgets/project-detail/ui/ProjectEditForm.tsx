@@ -2,7 +2,13 @@
 
 import { useState, type ChangeEvent } from "react";
 
-import { FileUpload, NameBadge, SubmitButton, Textarea } from "@repo/ui";
+import {
+  FileUpload,
+  NameBadge,
+  SubmitButton,
+  Textarea,
+  stripInvisibleChars,
+} from "@repo/ui";
 
 import { useGetMe } from "@/entities/auth";
 import {
@@ -125,9 +131,13 @@ export default function ProjectEditForm({
       <section className="flex flex-col gap-6 sm:flex-row sm:gap-8">
         {isLeader ? (
           <div className="mx-auto flex w-[240px] shrink-0 flex-col gap-1.5">
-            <FileUpload onChange={setThumbnail} className="h-[160px] w-[240px]" />
+            <FileUpload
+              onChange={setThumbnail}
+              className="h-[160px] w-[240px]"
+            />
             <span className="text-center text-xs text-gray-400">
-              프로젝트 목록에 224 x 112px(2:1 비율)로 표시돼요. 비율이 다르면 잘릴 수 있어요.
+              프로젝트 목록에 224 x 112px(2:1 비율)로 표시돼요. 비율이 다르면
+              잘릴 수 있어요.
             </span>
           </div>
         ) : (
@@ -155,9 +165,13 @@ export default function ProjectEditForm({
                 value={projectName}
                 disabled={!isLeader}
                 onChange={(e) => {
-                  const val = e.target.value.slice(0, MAX_NAME_LENGTH);
+                  const val = stripInvisibleChars(e.target.value).slice(
+                    0,
+                    MAX_NAME_LENGTH,
+                  );
                   setProjectName(val);
-                  if (val) setErrors((prev) => ({ ...prev, projectName: false }));
+                  if (val)
+                    setErrors((prev) => ({ ...prev, projectName: false }));
                 }}
                 className={underlineInput(errors.projectName)}
               />
@@ -188,7 +202,10 @@ export default function ProjectEditForm({
                 value={teamName}
                 disabled={!isLeader}
                 onChange={(e) => {
-                  const val = e.target.value.slice(0, MAX_NAME_LENGTH);
+                  const val = stripInvisibleChars(e.target.value).slice(
+                    0,
+                    MAX_NAME_LENGTH,
+                  );
                   setTeamName(val);
                   if (val) setErrors((prev) => ({ ...prev, teamName: false }));
                 }}
@@ -197,7 +214,9 @@ export default function ProjectEditForm({
             </label>
             <div className="flex items-center justify-between">
               {errors.teamName ? (
-                <span className="text-xs text-red-500">팀명을 입력해주세요</span>
+                <span className="text-xs text-red-500">
+                  팀명을 입력해주세요
+                </span>
               ) : (
                 <span />
               )}
@@ -248,7 +267,9 @@ export default function ProjectEditForm({
       </section>
 
       <section className="flex flex-col gap-3">
-        <span className="text-2xl font-medium text-gray-700">프로젝트 설명</span>
+        <span className="text-2xl font-medium text-gray-700">
+          프로젝트 설명
+        </span>
         <Textarea
           value={description}
           onChange={handleDescriptionChange}

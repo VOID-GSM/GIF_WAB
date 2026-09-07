@@ -3,7 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 
-import { FileUpload, SubmitButton, Textarea } from "@repo/ui";
+import {
+  FileUpload,
+  SubmitButton,
+  Textarea,
+  stripInvisibleChars,
+} from "@repo/ui";
 
 import { useGetMe } from "@/entities/auth";
 import {
@@ -90,9 +95,13 @@ export function CreateProjectView() {
       >
         <section className="flex flex-col gap-6 sm:flex-row sm:gap-8">
           <div className="mx-auto flex w-[240px] shrink-0 flex-col gap-1.5">
-            <FileUpload onChange={setThumbnail} className="h-[160px] w-[240px]" />
+            <FileUpload
+              onChange={setThumbnail}
+              className="h-[160px] w-[240px]"
+            />
             <span className="text-center text-xs text-gray-400">
-              프로젝트 목록에 224 x 112px(2:1 비율)로 표시돼요. 비율이 다르면 잘릴 수 있어요.
+              프로젝트 목록에 224 x 112px(2:1 비율)로 표시돼요. 비율이 다르면
+              잘릴 수 있어요.
             </span>
           </div>
 
@@ -106,7 +115,10 @@ export function CreateProjectView() {
                   type="text"
                   value={projectName}
                   onChange={(e) => {
-                    const val = e.target.value.slice(0, MAX_NAME_LENGTH);
+                    const val = stripInvisibleChars(e.target.value).slice(
+                      0,
+                      MAX_NAME_LENGTH,
+                    );
                     setProjectName(val);
                     if (val)
                       setErrors((prev) => ({ ...prev, projectName: false }));
@@ -139,7 +151,10 @@ export function CreateProjectView() {
                   type="text"
                   value={teamName}
                   onChange={(e) => {
-                    const val = e.target.value.slice(0, MAX_NAME_LENGTH);
+                    const val = stripInvisibleChars(e.target.value).slice(
+                      0,
+                      MAX_NAME_LENGTH,
+                    );
                     setTeamName(val);
                     if (val)
                       setErrors((prev) => ({ ...prev, teamName: false }));

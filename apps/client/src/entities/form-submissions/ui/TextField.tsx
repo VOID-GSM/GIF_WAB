@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { stripInvisibleChars } from "@repo/ui";
 
 const TEXT_MAX_LENGTH = 10000;
 
@@ -47,7 +48,9 @@ export default function TextField({
           const next = e.target.value;
           onChange(
             fieldId,
-            isComposing.current ? next : next.slice(0, TEXT_MAX_LENGTH),
+            isComposing.current
+              ? next
+              : stripInvisibleChars(next).slice(0, TEXT_MAX_LENGTH),
           );
         }}
         onCompositionStart={() => {
@@ -55,7 +58,13 @@ export default function TextField({
         }}
         onCompositionEnd={(e) => {
           isComposing.current = false;
-          onChange(fieldId, e.currentTarget.value.slice(0, TEXT_MAX_LENGTH));
+          onChange(
+            fieldId,
+            stripInvisibleChars(e.currentTarget.value).slice(
+              0,
+              TEXT_MAX_LENGTH,
+            ),
+          );
         }}
       />
       <span className="mt-1 self-end text-xs text-gray-400">

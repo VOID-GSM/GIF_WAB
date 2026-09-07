@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { isValidUrl, normalizeUrl } from "@repo/lib";
-import { Close, Plus, ProjectLinkChip } from "@repo/ui";
+import { Close, Plus, ProjectLinkChip, stripInvisibleChars } from "@repo/ui";
 
 import {
   useCreateProjectLink,
@@ -61,14 +61,14 @@ function LinkForm({
         <input
           autoFocus
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setTitle(stripInvisibleChars(e.target.value))}
           maxLength={TITLE_MAX_LENGTH}
           placeholder="이름"
           className={`${inputClassName} w-[92px]`}
         />
         <input
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => setUrl(stripInvisibleChars(e.target.value))}
           placeholder="github.com/..."
           className={`${inputClassName} w-[168px]`}
         />
