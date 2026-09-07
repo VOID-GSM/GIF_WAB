@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { isValidUrl, normalizeUrl } from "@repo/lib";
 import { Close, Plus, ProjectLinkChip, stripInvisibleChars } from "@repo/ui";
@@ -34,6 +34,13 @@ function LinkForm({
   const [title, setTitle] = useState(initialTitle);
   const [url, setUrl] = useState(initialUrl);
   const [error, setError] = useState("");
+  // 한글(IME) 조합 중에는 값을 가공하지 않는다 — 조합 도중 문자열이 바뀌면
+  // composition 세션이 끊겨 글자가 누락되거나 자모가 분리될 수 있다.
+  const isComposing = useRef(false);
+
+  const applyValue = (raw: string, setValue: (value: string) => void) => {
+    setValue(isComposing.current ? raw : stripInvisibleChars(raw));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +68,28 @@ function LinkForm({
         <input
           autoFocus
           value={title}
-          onChange={(e) => setTitle(stripInvisibleChars(e.target.value))}
+          onChange={(e) => applyValue(e.target.value, setTitle)}
+          onCompositionStart={() => {
+            isComposing.current = true;
+          }}
+          onCompositionEnd={(e) => {
+            isComposing.current = false;
+            applyValue(e.currentTarget.value, setTitle);
+          }}
           maxLength={TITLE_MAX_LENGTH}
           placeholder="이름"
           className={`${inputClassName} w-[92px]`}
         />
         <input
           value={url}
-          onChange={(e) => setUrl(stripInvisibleChars(e.target.value))}
+          onChange={(e) => applyValue(e.target.value, setUrl)}
+          onCompositionStart={() => {
+            isComposing.current = true;
+          }}
+          onCompositionEnd={(e) => {
+            isComposing.current = false;
+            applyValue(e.currentTarget.value, setUrl);
+          }}
           placeholder="github.com/..."
           className={`${inputClassName} w-[168px]`}
         />

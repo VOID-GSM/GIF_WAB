@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 
 import {
   FileUpload,
@@ -40,6 +40,23 @@ export function CreateProjectView() {
     members: false,
     description: false,
   });
+
+  // 한글(IME) 조합 중에는 값을 가공하지 않는다 — 조합 도중 문자열이 바뀌면
+  // composition 세션이 끊겨 글자가 누락되거나 자모가 분리될 수 있다.
+  // 한 번에 한 입력창만 조합되므로 ref 하나를 프로젝트명·팀명이 함께 쓴다.
+  const isComposing = useRef(false);
+
+  const applyName = (
+    raw: string,
+    setName: (value: string) => void,
+    key: "projectName" | "teamName",
+  ) => {
+    const value = isComposing.current
+      ? raw
+      : stripInvisibleChars(raw).slice(0, MAX_NAME_LENGTH);
+    setName(value);
+    if (value) setErrors((prev) => ({ ...prev, [key]: false }));
+  };
 
   const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(e.target.value.slice(0, MAX_DESCRIPTION_LENGTH));
@@ -114,14 +131,19 @@ export function CreateProjectView() {
                 <input
                   type="text"
                   value={projectName}
-                  onChange={(e) => {
-                    const val = stripInvisibleChars(e.target.value).slice(
-                      0,
-                      MAX_NAME_LENGTH,
+                  onChange={(e) =>
+                    applyName(e.target.value, setProjectName, "projectName")
+                  }
+                  onCompositionStart={() => {
+                    isComposing.current = true;
+                  }}
+                  onCompositionEnd={(e) => {
+                    isComposing.current = false;
+                    applyName(
+                      e.currentTarget.value,
+                      setProjectName,
+                      "projectName",
                     );
-                    setProjectName(val);
-                    if (val)
-                      setErrors((prev) => ({ ...prev, projectName: false }));
                   }}
                   className={underlineInput(errors.projectName)}
                 />
@@ -150,14 +172,15 @@ export function CreateProjectView() {
                 <input
                   type="text"
                   value={teamName}
-                  onChange={(e) => {
-                    const val = stripInvisibleChars(e.target.value).slice(
-                      0,
-                      MAX_NAME_LENGTH,
-                    );
-                    setTeamName(val);
-                    if (val)
-                      setErrors((prev) => ({ ...prev, teamName: false }));
+                  onChange={(e) =>
+                    applyName(e.target.value, setTeamName, "teamName")
+                  }
+                  onCompositionStart={() => {
+                    isComposing.current = true;
+                  }}
+                  onCompositionEnd={(e) => {
+                    isComposing.current = false;
+                    applyName(e.currentTarget.value, setTeamName, "teamName");
                   }}
                   className={underlineInput(errors.teamName)}
                 />
