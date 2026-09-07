@@ -37,6 +37,9 @@ export { default as GradeDropdown } from "./components/GradeDropdown/GradeDropdo
 
 export { default as Navbar } from "./widgets/Navbar/ui/Navbar";
 export { default as Sidebar } from "./widgets/Navbar/ui/Sidebar";
+export { default as NotificationBell } from "./widgets/Notification/ui/NotificationBell";
+export { default as NotificationPanel } from "./widgets/Notification/ui/NotificationPanel";
+export { formatNotificationTime } from "./widgets/Notification/lib/formatNotificationTime";
 export { default as ProjectInfo } from "./widgets/project-detail/ui/ProjectInfo";
 export { default as AiSummary } from "./widgets/project-detail/ui/AiSummary";
 export { default as DeadlineStatusSection } from "./widgets/project-detail/ui/DeadlineStatusSection";
@@ -62,12 +65,18 @@ export { default as Festival } from "./svg/Festival";
 export { default as GeneralSubject } from "./svg/GeneralSubject";
 export { default as MajorSubject } from "./svg/MajorSubject";
 export { default as Person } from "./svg/Person";
+export { default as Bell } from "./svg/Bell";
 
 export { stripInvisibleChars } from "./lib/sanitizeText";
 
 export type { NavItem } from "./widgets/Navbar/model/type";
 export type { NavbarProps } from "./widgets/Navbar/model/type";
 export type { SidebarProps } from "./widgets/Navbar/model/type";
+export type {
+  NotificationBellProps,
+  NotificationPanelProps,
+  NotificationPanelAlign,
+} from "./widgets/Notification/model/type";
 
 export { ADMIN_NAV_ITEMS, CLIENT_NAV_ITEMS } from "./widgets/Navbar/model/nav";
 export type { StyleOption } from "./components/Dropdown/StyleDropdown";
