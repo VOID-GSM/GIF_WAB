@@ -1,8 +1,11 @@
 "use client";
 
-import { Close, Textarea, FileUpload } from "@repo/ui";
+import { Close, Textarea, FileUpload, splitAllowedExtensions } from "@repo/ui";
 import CalendarAnswer from "@/entities/from-management/ui/Calendaranswer";
-import type { AdminFormDetail, FormField } from "@/entities/from-management/model/type";
+import type {
+  AdminFormDetail,
+  FormField,
+} from "@/entities/from-management/model/type";
 import {
   formatDeadlineDate,
   formatDeadlineTime,
@@ -15,6 +18,10 @@ type Props = {
 
 // 실제 학생 입력 폼(공유 컴포넌트)을 그대로 보여주되, 클릭/입력은 막는다.
 function PreviewField({ field }: { field: FormField }) {
+  const { extensions, allowUrl } = splitAllowedExtensions(
+    field.allowedExtensions,
+  );
+
   // required 를 내려주지 않는 구버전 양식은 필수로 간주한다.
   const required = field.required ?? true;
 
@@ -44,10 +51,25 @@ function PreviewField({ field }: { field: FormField }) {
       )}
       {field.type === "FILE" && (
         <div className="pointer-events-none mt-2 select-none">
+          {allowUrl && (
+            <div className="mb-3 flex gap-2">
+              <span className="rounded-full border border-yellow-600 bg-yellow-600/10 px-4 py-1.5 text-[13px] font-medium text-gray-900 dark:bg-yellow-500/15">
+                파일 업로드
+              </span>
+              <span className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[13px] font-medium text-gray-500">
+                링크 제출
+              </span>
+            </div>
+          )}
           <FileUpload className="h-[160px] w-full" />
-          {field.allowedExtensions && field.allowedExtensions.length > 0 && (
+          {extensions.length > 0 && (
             <span className="mt-2 block text-[12px] font-medium text-gray-400">
-              허용 형식: {field.allowedExtensions.join(", ")}
+              허용 형식: {extensions.join(", ")}
+            </span>
+          )}
+          {allowUrl && (
+            <span className="mt-1 block text-[12px] font-medium text-gray-400">
+              외부 링크(URL) 제출 허용
             </span>
           )}
         </div>

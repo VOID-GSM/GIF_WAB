@@ -7,6 +7,11 @@ import Input from "./components/Input/Input";
 import Textarea from "./components/Input/Textarea";
 import StyleDropdown from "./components/Dropdown/StyleDropdown";
 import type { StyleOption } from "./components/Dropdown/StyleDropdown";
+import {
+  ALLOWED_EXTENSION_OPTIONS,
+  URL_SUBMISSION_FLAG,
+  splitAllowedExtensions,
+} from "./lib/formFieldOptions";
 
 interface PostFormRequestField {
   title: string;
@@ -15,7 +20,7 @@ interface PostFormRequestField {
   orderIndex: number;
   /** 학생이 반드시 답변해야 하는 항목인지 여부 (false면 비워둔 채 제출 가능) */
   required: boolean;
-  allowedExtensions?: string[]; // FILE 타입에서 client 가 제출 가능한 확장자
+  allowedExtensions?: string[]; // FILE 타입에서 client 가 제출 가능한 확장자 + "url"(외부 링크 제출 허용 플래그)
 }
 
 export interface PostFormRequest {
@@ -44,19 +49,6 @@ const STYLE_LABEL: Record<StyleOption, string> = {
   text: "줄 글 텍스트",
   calendar: "캘린더",
 };
-
-// FILE 타입에서 admin 이 허용할 수 있는 제출 파일 확장자 목록
-const ALLOWED_EXTENSION_OPTIONS = [
-  "pdf",
-  "hwp",
-  "hwpx",
-  "docx",
-  "pptx",
-  "xlsx",
-  "png",
-  "jpg",
-  "zip",
-] as const;
 
 const TITLE_MAX_LENGTH = 50;
 const DESCRIPTION_MAX_LENGTH = 200;
@@ -100,11 +92,16 @@ export default function FormCard({
     });
   };
 
-  const toggleExtension = (ext: string) => {
-    const current = field.allowedExtensions ?? [];
-    const next = current.includes(ext)
-      ? current.filter((e) => e !== ext)
-      : [...current, ext];
+  // 파일 확장자와 URL 허용 플래그는 같은 allowedExtensions 배열에 함께 저장된다.
+  const { extensions: selectedExtensions, allowUrl } = splitAllowedExtensions(
+    field.allowedExtensions,
+  );
+
+  const toggleAllowedValue = (value: string) => {
+    const current = (field.allowedExtensions ?? []).map((e) => e.toLowerCase());
+    const next = current.includes(value)
+      ? current.filter((e) => e !== value)
+      : [...current, value];
     onChange(field.id, { allowedExtensions: next });
   };
 
@@ -207,28 +204,53 @@ export default function FormCard({
             </div>
           )}
           {selectedStyle === "file" && (
-            <div className="flex flex-col gap-2 pt-1">
-              <span className="text-[13px] font-medium text-gray-500">
-                허용 파일 형식
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {ALLOWED_EXTENSION_OPTIONS.map((ext) => {
-                  const selected = (field.allowedExtensions ?? []).includes(ext);
-                  return (
-                    <button
-                      key={ext}
-                      type="button"
-                      onClick={() => toggleExtension(ext)}
-                      className={`px-3 py-1.5 rounded-full text-[13px] border transition-colors cursor-pointer ${
-                        selected
-                          ? "border-yellow-600 bg-yellow-600/10 text-gray-900 dark:bg-yellow-500/15"
-                          : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
-                      }`}
-                    >
-                      {ext}
-                    </button>
-                  );
-                })}
+            <div className="flex flex-col gap-4 pt-1">
+              <div className="flex flex-col gap-2">
+                <span className="text-[13px] font-medium text-gray-500">
+                  허용 파일 형식
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {ALLOWED_EXTENSION_OPTIONS.map((ext) => {
+                    const selected = selectedExtensions.includes(ext);
+                    return (
+                      <button
+                        key={ext}
+                        type="button"
+                        onClick={() => toggleAllowedValue(ext)}
+                        className={`px-3 py-1.5 rounded-full text-[13px] border transition-colors cursor-pointer ${
+                          selected
+                            ? "border-yellow-600 bg-yellow-600/10 text-gray-900 dark:bg-yellow-500/15"
+                            : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                        }`}
+                      >
+                        {ext}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="text-[13px] font-medium text-gray-500">
+                  제출 방식
+                </span>
+                <label className="flex w-fit cursor-pointer items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={allowUrl}
+                    onChange={() => toggleAllowedValue(URL_SUBMISSION_FLAG)}
+                    className="mt-[3px] size-4 shrink-0 cursor-pointer accent-yellow-600"
+                  />
+                  <span className="flex flex-col">
+                    <span className="text-[13px] font-medium text-gray-900">
+                      외부 링크(URL) 제출 허용
+                    </span>
+                    <span className="text-[12px] text-gray-400">
+                      캔바·미리캔버스·Google 드라이브 등 공유 링크로도 제출할 수
+                      있습니다.
+                    </span>
+                  </span>
+                </label>
               </div>
             </div>
           )}

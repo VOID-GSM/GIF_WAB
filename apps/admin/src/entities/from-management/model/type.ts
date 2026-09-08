@@ -26,7 +26,7 @@ export interface FormField {
   orderIndex: number;
   /** 필수 항목 여부 — required 를 내려주지 않는 구버전 양식은 필수로 간주한다 */
   required?: boolean;
-  allowedExtensions?: string[]; // FILE 타입에서 client 가 제출 가능한 확장자
+  allowedExtensions?: string[]; // FILE 타입에서 client 가 제출 가능한 확장자 + "url"(외부 링크 제출 허용 플래그)
 }
 
 // GET /api/form/{formId} 응답 — 제출 상세보기용 양식 단건 조회
