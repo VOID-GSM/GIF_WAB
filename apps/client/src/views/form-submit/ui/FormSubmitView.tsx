@@ -118,9 +118,11 @@ export default function FormSubmitView({ formId }: Props) {
       (field): FormAnswerItem[] => {
         const fId = field.fieldId ?? field.id ?? 0;
         if (field.type === "FILE") {
-          // 파일은 upload 엔드포인트가, 외부 링크는 textAnswer 가 담당한다.
+          // 파일은 upload 엔드포인트가, 외부 링크는 answer 가 담당한다.
+          // 서버는 FILE 항목의 필수 검사를 filePath 로 하므로 textAnswer 만 보내면
+          // "필수 입력" 으로 반려된다. 표시는 textAnswer 를 쓰므로 양쪽에 함께 싣는다.
           const url = getSubmittedUrl(field, fId);
-          return url ? [{ fieldId: fId, textAnswer: url }] : [];
+          return url ? [{ fieldId: fId, textAnswer: url, filePath: url }] : [];
         }
 
         if (field.type === "DATE" || field.type === "CALENDAR") {

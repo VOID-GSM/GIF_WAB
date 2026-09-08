@@ -234,7 +234,7 @@ export default function FormMySubmitView({ formId }: Props) {
           // 외부 링크로 제출한 항목은 textAnswer 로 보낸다. PATCH 는 answer 를
           // 통째로 교체하므로 filePath 를 함께 보내지 않으면 기존 파일은 사라진다.
           const url = getSubmittedUrl(field, fId);
-          if (url) return [{ fieldId: fId, textAnswer: url }];
+          if (url) return [{ fieldId: fId, textAnswer: url, filePath: url }];
 
           // 새 파일/삭제는 upload·delete 엔드포인트가 처리한다.
           // 그 외(파일을 안 건드린 경우)에는 PATCH 가 answer 를 통째로 교체하면서
