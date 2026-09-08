@@ -185,7 +185,15 @@ export default function FileField({
             </div>
 
             <div className="mt-2 flex items-baseline gap-2 text-[12px]">
-              {uploadedFilePath ? (
+              <span className="min-w-0 truncate font-medium text-gray-700">
+                {fileName}
+              </span>
+              <span className="flex-shrink-0 text-gray-400">
+                {formatFileSize(size)}
+              </span>
+
+              {/* 미리보기만으로는 원본을 받을 수 없으므로 내려받기는 항상 노출한다. */}
+              {uploadedFilePath && (
                 <button
                   type="button"
                   onClick={() => {
@@ -193,18 +201,12 @@ export default function FileField({
                       download({ fileUrl: uploadedFilePath, fileName });
                     }
                   }}
-                  className="min-w-0 cursor-pointer truncate font-medium text-gray-700 hover:underline"
+                  disabled={isDownloading}
+                  className="ml-auto flex-shrink-0 cursor-pointer font-medium text-gray-700 underline underline-offset-2 transition-colors hover:text-gray-900 disabled:cursor-default disabled:opacity-60"
                 >
-                  {fileName}
+                  {isDownloading ? "내려받는 중..." : "내려받기"}
                 </button>
-              ) : (
-                <span className="min-w-0 truncate font-medium text-gray-700">
-                  {fileName}
-                </span>
               )}
-              <span className="flex-shrink-0 text-gray-400">
-                {formatFileSize(size)}
-              </span>
             </div>
 
             {!readOnly && formatHint}
