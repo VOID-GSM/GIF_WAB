@@ -25,6 +25,7 @@ export { default as Markdown } from "./components/Markdown/Markdown";
 export { default as FileUpload } from "./components/FileUpload/FileUpload";
 export { default as ProjectLogo } from "./components/ProjectLogo/ProjectLogo";
 export { default as ProjectLinkChip } from "./components/ProjectLink/ProjectLinkChip";
+export { default as SubmittedLinkCard } from "./components/SubmittedLink/SubmittedLinkCard";
 
 export { default as StyleDropdown } from "./components/Dropdown/StyleDropdown";
 
@@ -62,6 +63,7 @@ export { default as Festival } from "./svg/Festival";
 export { default as GeneralSubject } from "./svg/GeneralSubject";
 export { default as MajorSubject } from "./svg/MajorSubject";
 export { default as Person } from "./svg/Person";
+export { default as Link } from "./svg/Link";
 
 export {
   URL_SUBMISSION_FLAG,

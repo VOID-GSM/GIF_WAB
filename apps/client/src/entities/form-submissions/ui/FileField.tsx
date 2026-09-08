@@ -4,9 +4,12 @@ import {
   Upload,
   File,
   Close,
+  Link,
+  SubmittedLinkCard,
   splitAllowedExtensions,
   isValidSubmissionUrl,
 } from "@repo/ui";
+import { isExternalSubmissionUrl } from "@repo/lib";
 import { useDeleteFormUpload } from "../hooks/useDeleteFormUpload";
 import { useDownloadFile } from "../hooks/useDownloadFile";
 
@@ -51,6 +54,12 @@ export default function FileField({
   const { mutate: download, isPending: isDownloading } = useDownloadFile();
   const [isDragging, setIsDragging] = useState(false);
 
+  // 외부 링크로 제출한 항목은 filePath 에도 URL 이 담겨 온다.
+  // 업로드된 파일도 API 서버의 절대 URL 로 내려오므로, API 서버 밖을 가리킬 때만 링크로 본다.
+  const isExternalPath = !!filePath && isExternalSubmissionUrl(filePath);
+  const uploadedFilePath = isExternalPath ? undefined : filePath;
+  const linkValue = url.trim() || (isExternalPath ? filePath : "") || "";
+
   // admin 이 확장자·URL 허용 여부를 지정한 경우에만 제한한다.
   const { extensions, allowUrl } = splitAllowedExtensions(allowedExtensions);
   const hasExtensionLimit = extensions.length > 0;
@@ -66,7 +75,7 @@ export default function FileField({
   };
 
   const handleDelete = () => {
-    if (filePath && submitId) {
+    if (uploadedFilePath && submitId) {
       deleteUpload(
         { fieldId, submitId }, // submitId 추가
         { onSuccess: () => onChange(fieldId, null) },
@@ -130,33 +139,18 @@ export default function FileField({
   };
 
   // 제출된 링크를 읽기 전용으로 보여주는 카드
-  const submittedLink = url.trim() ? (
-    <a
-      href={url.trim()}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-[22px] rounded-[10px] border border-gray-80 pl-[24px] pr-[30px] py-[15px] transition-colors hover:bg-gray-100/60"
-    >
-      <span className="flex-shrink-0">
-        <File />
-      </span>
-      <div className="flex min-w-0 flex-col">
-        <span className="truncate text-[14px] font-semibold text-gray-900">
-          {url.trim()}
-        </span>
-        <span className="text-[11px] text-gray-400">외부 링크</span>
-      </div>
-    </a>
+  const submittedLink = linkValue ? (
+    <SubmittedLinkCard url={linkValue} />
   ) : null;
 
   // 파일 첨부 영역 — 선택된 파일이 있으면 카드, 없으면 업로드 박스
   const renderFileArea = () => {
-    if (file || filePath) {
+    if (file || uploadedFilePath) {
       // 새로 선택한 파일 > 서버 원본 파일명 > 경로 마지막(UUID) 순으로 표시
       const fileName =
         file?.name ??
         originalFileName ??
-        filePath?.split("/").pop() ??
+        uploadedFilePath?.split("/").pop() ??
         "첨부파일";
       const size = file?.size ?? fileSize ?? 0;
 
@@ -164,11 +158,11 @@ export default function FileField({
         <div>
           <div
             className={`flex items-center justify-between gap-3 rounded-[10px] border border-gray-80 pl-[24px] pr-[30px] py-[15px] ${
-              filePath ? "cursor-pointer" : ""
+              uploadedFilePath ? "cursor-pointer" : ""
             }`}
             onClick={() => {
-              if (filePath && !isDownloading) {
-                download({ fileUrl: filePath, fileName });
+              if (uploadedFilePath && !isDownloading) {
+                download({ fileUrl: uploadedFilePath, fileName });
               }
             }}
           >
@@ -247,21 +241,47 @@ export default function FileField({
   const renderLinkArea = () => {
     const trimmed = url.trim();
     const isInvalid = trimmed.length > 0 && !isValidSubmissionUrl(trimmed);
+    const isValid = trimmed.length > 0 && !isInvalid;
 
     return (
       <div>
-        <input
-          type="url"
-          inputMode="url"
-          value={url}
-          placeholder="https://www.canva.com/design/..."
-          onChange={(e) => onUrlChange?.(fieldId, e.target.value)}
-          className={`w-full rounded-[10px] border px-4 py-3 text-[14px] text-gray-900 outline-none transition-colors placeholder:text-gray-400 bg-white ${
+        <div
+          className={`flex items-stretch overflow-hidden rounded-[10px] border bg-white transition-colors ${
             isInvalid
               ? "border-red-500"
-              : "border-gray-80 focus:border-gray-600"
+              : "border-gray-80 focus-within:border-gray-600"
           }`}
-        />
+        >
+          <span
+            aria-hidden="true"
+            className="flex w-[46px] flex-shrink-0 items-center justify-center border-r border-gray-80 bg-gray-100 text-gray-500"
+          >
+            <Link />
+          </span>
+
+          <input
+            type="url"
+            inputMode="url"
+            value={url}
+            placeholder="https://www.canva.com/design/..."
+            onChange={(e) => onUrlChange?.(fieldId, e.target.value)}
+            className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[14px] text-gray-900 outline-none placeholder:text-gray-400"
+          />
+
+          {/* 제출 전에 권한 설정이 맞는지 직접 확인할 수 있게 한다 —
+              링크 자체는 멀쩡한데 비공개라 열리지 않는 경우가 가장 흔하다. */}
+          {isValid && (
+            <a
+              href={trimmed}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-shrink-0 items-center border-l border-gray-80 px-4 text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-100"
+            >
+              열어보기
+            </a>
+          )}
+        </div>
+
         <span
           className={`mt-2 block text-[12px] font-regular ${
             isInvalid ? "text-red-500" : "text-gray-400"
@@ -269,15 +289,16 @@ export default function FileField({
         >
           {isInvalid
             ? "http:// 또는 https:// 로 시작하는 링크를 입력해주세요."
-            : "캔바·미리캔버스·Google 드라이브 등 공유 링크를 붙여넣어 주세요. 권한이 '링크가 있는 모든 사용자'인지 확인해주세요."}
+            : "공유 권한을 '링크가 있는 모든 사용자'로 바꾼 뒤 붙여넣어 주세요."}
         </span>
       </div>
     );
   };
 
   if (readOnly) {
-    if (file || filePath) return renderFileArea();
+    // 링크 제출이 파일보다 우선한다 — filePath 에 URL 이 담겨 오는 경우가 있다.
     if (submittedLink) return submittedLink;
+    if (file || uploadedFilePath) return renderFileArea();
     return (
       <div className="flex items-center justify-center w-full border border-gray-80 rounded-[10px] py-[30px]">
         <span className="text-gray-400 text-[13px]">
@@ -292,7 +313,11 @@ export default function FileField({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-2">
+      <div
+        role="tablist"
+        aria-label="제출 방식"
+        className="inline-flex self-start rounded-[10px] bg-gray-100 p-1"
+      >
         {(
           [
             ["file", "파일 업로드"],
@@ -302,11 +327,13 @@ export default function FileField({
           <button
             key={value}
             type="button"
+            role="tab"
+            aria-selected={mode === value}
             onClick={() => handleModeChange(value)}
-            className={`rounded-full border px-4 py-1.5 text-[13px] font-medium transition-colors cursor-pointer ${
+            className={`cursor-pointer rounded-[7px] px-4 py-1.5 text-[13px] font-medium transition-colors ${
               mode === value
-                ? "border-yellow-600 bg-yellow-600/10 text-gray-900 dark:bg-yellow-500/15"
-                : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             {label}

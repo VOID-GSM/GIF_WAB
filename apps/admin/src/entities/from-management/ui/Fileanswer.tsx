@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { SubmitAnswer } from "@/entities/from-management/model/type";
-import { File } from "@repo/ui";
+import { File, SubmittedLinkCard } from "@repo/ui";
+import { isExternalSubmissionUrl } from "@repo/lib";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,28 +19,18 @@ export default function FileAnswer({
 }) {
   const [downloading, setDownloading] = useState(false);
 
-  const filePath = answer?.filePath;
-  // 파일 대신 외부 링크(URL)로 제출한 경우 링크는 textAnswer 로 내려온다.
-  const submittedUrl = answer?.textAnswer?.trim();
+  const rawFilePath = answer?.filePath;
+  // 파일 대신 외부 링크(URL)로 제출한 경우 링크는 textAnswer 로 내려오며,
+  // 서버 필수 검사를 통과시키려고 filePath 에도 같은 URL 을 함께 저장한다.
+  // 따라서 filePath 가 외부 URL 이면 업로드 파일이 아니라 링크로 표시한다.
+  const isExternalPath = !!rawFilePath && isExternalSubmissionUrl(rawFilePath);
+  const filePath = isExternalPath ? undefined : rawFilePath;
+  const submittedUrl =
+    answer?.textAnswer?.trim() || (isExternalPath ? rawFilePath : undefined);
 
   if (!filePath) {
     if (submittedUrl) {
-      return (
-        <a
-          href={submittedUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex w-full items-center gap-[22px] rounded-[10px] border border-gray-80 pl-[24px] pr-[30px] py-[15px] transition-colors hover:bg-gray-50"
-        >
-          <File />
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-[14px] font-semibold text-gray-900">
-              {submittedUrl}
-            </span>
-            <span className="text-[11px] text-gray-400">외부 링크</span>
-          </div>
-        </a>
-      );
+      return <SubmittedLinkCard url={submittedUrl} />;
     }
     return <span className="text-gray-400">파일 없음</span>;
   }
@@ -90,7 +81,7 @@ export default function FileAnswer({
           <span className="text-[11px] text-gray-400">
             {downloading
               ? "다운로드 중..."
-              : answer.fileSize
+              : answer?.fileSize
                 ? `${(answer.fileSize / 1024 / 1024).toFixed(1)}MB`
                 : ""}
           </span>

@@ -16,11 +16,41 @@ export const isValidUrl = (url: string): boolean => {
   }
 };
 
+// 호스트 뒤에 붙는 경로·쿼리. 링크를 호스트와 나눠 보여줄 때 아랫줄로 쓴다.
+// 루트 주소("https://canva.com/")처럼 경로가 없으면 빈 문자열.
+export const getLinkPath = (url: string): string => {
+  try {
+    const { pathname, search } = new URL(normalizeUrl(url));
+    const path = `${pathname}${search}`;
+    return path === "/" ? "" : path;
+  } catch {
+    return "";
+  }
+};
+
 // 링크에 보조 정보로 노출할 호스트명 (www. 제거)
 export const getLinkHost = (url: string): string => {
   try {
     return new URL(normalizeUrl(url)).hostname.replace(/^www\./, "");
   } catch {
     return url;
+  }
+};
+
+// 외부 링크 제출인지 판별한다.
+// 업로드된 파일도 API 서버의 절대 URL(https://api.../files/form/xxx.png)로 내려오기 때문에
+// "http(s) 절대 URL 인가" 만으로는 사용자가 붙여넣은 링크와 구분되지 않는다.
+// API 서버가 아닌 곳을 가리켜야 외부 링크다.
+export const isExternalSubmissionUrl = (url: string): boolean => {
+  try {
+    const target = new URL(url);
+    if (target.protocol !== "http:" && target.protocol !== "https:") return false;
+
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiBaseUrl) return true;
+
+    return target.origin !== new URL(apiBaseUrl).origin;
+  } catch {
+    return false;
   }
 };
