@@ -190,6 +190,13 @@ export default function FormMySubmitView({ formId }: Props) {
       if (type === "TEXT" && !getTextValue(fId).trim()) {
         errors[fId] = "필수 항목입니다.";
       }
+      // DATE·CALENDAR 는 비워두면 dateAnswer 가 빈 배열로 나가 서버에서 필수 항목 오류가 난다.
+      if (
+        (type === "DATE" || type === "CALENDAR") &&
+        getCalendarValue(fId).length === 0
+      ) {
+        errors[fId] = "필수 항목입니다.";
+      }
       if (type === "FILE") {
         const { allowUrl } = splitAllowedExtensions(field.allowedExtensions);
         const url = getSubmittedUrl(field, fId);
