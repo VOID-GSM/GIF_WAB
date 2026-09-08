@@ -23,6 +23,13 @@ export { default as Input } from "./components/Input/Input";
 export { default as Textarea } from "./components/Input/Textarea";
 export { default as Markdown } from "./components/Markdown/Markdown";
 export { default as FileUpload } from "./components/FileUpload/FileUpload";
+export { default as FilePreview } from "./components/FilePreview/FilePreview";
+export {
+  getPreviewKind,
+  getPreviewKindFromMime,
+  canAttemptPreview,
+} from "./components/FilePreview/lib";
+export { useFileObjectUrl } from "./components/FilePreview/useFileObjectUrl";
 export { default as ProjectLogo } from "./components/ProjectLogo/ProjectLogo";
 export { default as ProjectLinkChip } from "./components/ProjectLink/ProjectLinkChip";
 export { default as SubmittedLinkCard } from "./components/SubmittedLink/SubmittedLinkCard";

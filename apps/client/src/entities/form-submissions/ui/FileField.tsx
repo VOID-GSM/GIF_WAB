@@ -6,6 +6,8 @@ import {
   Close,
   Link,
   SubmittedLinkCard,
+  FilePreview,
+  canAttemptPreview,
   splitAllowedExtensions,
   isValidSubmissionUrl,
 } from "@repo/ui";
@@ -19,7 +21,7 @@ type SubmitMode = "file" | "link";
 
 interface FileFieldProps {
   fieldId: number;
-  file: { name: string; size: number } | null;
+  file: File | null;
   filePath?: string;
   fileSize?: number;
   originalFileName?: string; // 서버에 저장된 파일의 원본 파일명
@@ -153,6 +155,62 @@ export default function FileField({
         uploadedFilePath?.split("/").pop() ??
         "첨부파일";
       const size = file?.size ?? fileSize ?? 0;
+
+      // 이미지·PDF 는 내려받지 않고 바로 확인할 수 있게 미리보기로 보여준다.
+      // 미리보기가 곧 파일이므로 아래에 파일 카드를 겹쳐 두지 않고,
+      // 지우기는 미리보기 위에 얹고 이름은 밑에 캡션으로 적는다.
+      if (canAttemptPreview(fileName)) {
+        return (
+          <div>
+            <div className="relative overflow-hidden rounded-[10px] border border-gray-80">
+              <FilePreview
+                file={file}
+                filePath={uploadedFilePath}
+                fileName={fileName}
+              />
+
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isDeleting) handleDelete();
+                  }}
+                  disabled={isDeleting}
+                  aria-label={`${fileName} 지우기`}
+                  className="absolute top-2 right-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-black/55 text-white transition-colors hover:bg-black/75 disabled:cursor-default disabled:opacity-50"
+                >
+                  <Close width={11} height={11} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+
+            <div className="mt-2 flex items-baseline gap-2 text-[12px]">
+              {uploadedFilePath ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isDownloading) {
+                      download({ fileUrl: uploadedFilePath, fileName });
+                    }
+                  }}
+                  className="min-w-0 cursor-pointer truncate font-medium text-gray-700 hover:underline"
+                >
+                  {fileName}
+                </button>
+              ) : (
+                <span className="min-w-0 truncate font-medium text-gray-700">
+                  {fileName}
+                </span>
+              )}
+              <span className="flex-shrink-0 text-gray-400">
+                {formatFileSize(size)}
+              </span>
+            </div>
+
+            {!readOnly && formatHint}
+          </div>
+        );
+      }
 
       return (
         <div>

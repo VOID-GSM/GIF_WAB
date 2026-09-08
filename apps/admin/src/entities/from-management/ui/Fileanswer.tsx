@@ -1,7 +1,12 @@
 "use client";
 import { useState } from "react";
 import { SubmitAnswer } from "@/entities/from-management/model/type";
-import { File, SubmittedLinkCard } from "@repo/ui";
+import {
+  File,
+  FilePreview,
+  SubmittedLinkCard,
+  canAttemptPreview,
+} from "@repo/ui";
 import { isExternalSubmissionUrl } from "@repo/lib";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -65,20 +70,25 @@ export default function FileAnswer({
     }
   };
 
-  return (
-    <button
-      type="button"
-      onClick={handleDownload}
-      disabled={downloading}
-      className="flex w-full items-center justify-between rounded-[10px] border border-gray-80 pl-[24px] pr-[30px] py-[15px] text-left cursor-pointer transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-60"
-    >
-      <div className="flex gap-[22px]">
-        <File />
-        <div className="flex flex-col">
-          <span className="text-[14px] font-semibold text-gray-900">
+  // 이미지·PDF 는 내려받지 않고 바로 확인할 수 있게 미리보기로 보여준다.
+  // 미리보기가 곧 파일이라 아래에 파일 카드를 겹치지 않고 이름만 캡션으로 적는다.
+  if (canAttemptPreview(fileName)) {
+    return (
+      <div className="w-full">
+        <div className="overflow-hidden rounded-[10px] border border-gray-80">
+          <FilePreview filePath={filePath} fileName={fileName} />
+        </div>
+
+        <div className="mt-2 flex items-baseline gap-2 text-[12px]">
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
+            className="min-w-0 cursor-pointer truncate font-medium text-gray-700 hover:underline disabled:cursor-default disabled:opacity-60"
+          >
             {fileName}
-          </span>
-          <span className="text-[11px] text-gray-400">
+          </button>
+          <span className="flex-shrink-0 text-gray-400">
             {downloading
               ? "다운로드 중..."
               : answer?.fileSize
@@ -87,6 +97,33 @@ export default function FileAnswer({
           </span>
         </div>
       </div>
-    </button>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <button
+        type="button"
+        onClick={handleDownload}
+        disabled={downloading}
+        className="flex w-full items-center justify-between rounded-[10px] border border-gray-80 pl-[24px] pr-[30px] py-[15px] text-left cursor-pointer transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-60"
+      >
+        <div className="flex gap-[22px]">
+          <File />
+          <div className="flex flex-col">
+            <span className="text-[14px] font-semibold text-gray-900">
+              {fileName}
+            </span>
+            <span className="text-[11px] text-gray-400">
+              {downloading
+                ? "다운로드 중..."
+                : answer?.fileSize
+                  ? `${(answer.fileSize / 1024 / 1024).toFixed(1)}MB`
+                  : ""}
+            </span>
+          </div>
+        </div>
+      </button>
+    </div>
   );
 }

@@ -54,3 +54,11 @@ export const isExternalSubmissionUrl = (url: string): boolean => {
     return false;
   }
 };
+
+// 서버가 내려준 파일 경로를 실제로 받아올 수 있는 절대 URL 로 바꾼다.
+// 이미 절대 URL(외부 링크 제출 등)이면 그대로 둔다.
+export const resolveApiFileUrl = (filePath: string): string => {
+  if (/^https?:\/\//i.test(filePath)) return filePath;
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "";
+  return `${base}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+};
